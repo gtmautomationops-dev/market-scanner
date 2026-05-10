@@ -1,0 +1,38 @@
+name: Market Scanner - Daily Scan
+
+on:
+  schedule:
+    # 9:35 AM ET (13:35 UTC) - shortly after market open
+    - cron: '35 13 * * 1-5'
+    # 4:05 PM ET (20:05 UTC) - shortly after market close
+    - cron: '5 20 * * 1-5'
+  workflow_dispatch: # manual trigger
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run scanner
+        run: python scripts/scanner.py
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          publish_branch: gh-pages
