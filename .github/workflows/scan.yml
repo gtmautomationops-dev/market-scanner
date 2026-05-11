@@ -36,6 +36,8 @@ jobs:
 
       - name: Send email alert
         uses: dawidd6/action-send-mail@v3
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         with:
           server_address: smtp.gmail.com
           server_port: 465
@@ -48,7 +50,7 @@ jobs:
           html_body: file://docs/email_alert.html
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
