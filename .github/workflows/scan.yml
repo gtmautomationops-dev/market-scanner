@@ -30,6 +30,23 @@ jobs:
       - name: Run scanner
         run: python scripts/scanner.py
 
+      - name: Read email subject
+        id: subject
+        run: echo "subject=$(cat docs/email_subject.txt)" >> $GITHUB_OUTPUT
+
+      - name: Send email alert
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USERNAME }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: ${{ steps.subject.outputs.subject }}
+          to: gtmautomation.ops@gmail.com
+          from: Market Scanner <${{ secrets.GMAIL_USERNAME }}>
+          html_body: file://docs/email_alert.html
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:

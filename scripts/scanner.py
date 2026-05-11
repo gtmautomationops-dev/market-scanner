@@ -2,12 +2,14 @@
 """
 Market Scanner — Technical + Volume + Peter Lynch composite scoring.
 Outputs docs/index.html for GitHub Pages deployment.
+Also writes docs/email_alert.html for GitHub Actions email delivery.
 """
 
 import json
 import time
 from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import yfinance as yf
 
@@ -925,6 +927,179 @@ filterAndRender();
 </html>"""
 
 
+# ─── EMAIL GENERATOR ─────────────────────────────────────────────────────────
+
+def generate_email_html(results, updated):
+    """
+    Build an HTML email showing actionable signals only:
+    all Strong Buys + Buys with R:R >= 2.0, sorted by composite score.
+    """
+    actionable = [
+        r for r in results
+        if r["signal"] == "Strong Buy"
+        or (r["signal"] == "Buy" and r["rr"] >= 2.0)
+    ]
+    actionable.sort(key=lambda x: -x["composite"])
+
+    now_et = datetime.now(ZoneInfo("America/New_York"))
+    period = "Morning Open" if now_et.hour < 14 else "Afternoon Close"
+    subject_date = now_et.strftime("%B %d, %Y")
+
+    def row_color(signal):
+        return "#d4edda" if signal == "Strong Buy" else "#ddefd6"
+
+    def peg_color(peg):
+        if peg is None:
+            return "#5c4a35"
+        return "#2d5a27" if peg < 1 else "#7a2020" if peg > 2 else "#6b5400"
+
+    rows_html = ""
+    if not actionable:
+        rows_html = """
+        <tr><td colspan="8" style="padding:24px;text-align:center;color:#8a7560;
+            font-family:Georgia,serif;font-size:14px;">
+            No actionable signals at this scan. Market conditions are mixed — patience is a position.
+        </td></tr>"""
+    else:
+        for r in actionable:
+            bg = row_color(r["signal"])
+            peg_str = f'<span style="color:{peg_color(r["peg"])}">{r["peg"]:.2f}</span>' if r["peg"] else "—"
+            ytd_color = "#2d5a27" if r["ytd"] >= 0 else "#7a2020"
+            ytd_str = f'{"+" if r["ytd"]>=0 else ""}{r["ytd"]:.1f}%'
+            vol_arrow = "▲" if "Accum" in (r["vol_label"] or "") else "▼" if "Distrib" in (r["vol_label"] or "") else "–"
+            rr_color = "#2d5a27" if r["rr"] >= 2 else "#6b5400"
+
+            rows_html += f"""
+            <tr style="background:{bg};border-bottom:1px solid #d4c9b8;">
+              <td style="padding:10px 12px;font-family:'Courier New',monospace;font-size:13px;font-weight:bold;color:#1a1008;white-space:nowrap;">
+                {r['ticker']}
+              </td>
+              <td style="padding:10px 12px;font-family:Georgia,serif;font-size:12px;color:#2c2419;max-width:160px;">
+                {r['name']}
+              </td>
+              <td style="padding:10px 12px;text-align:center;">
+                <span style="display:inline-block;padding:2px 8px;border-radius:3px;
+                  background:{'#d4edda' if r['signal']=='Strong Buy' else '#ddefd6'};
+                  color:{'#1a4a1a' if r['signal']=='Strong Buy' else '#2d5a27'};
+                  border:1px solid {'#b8d9c0' if r['signal']=='Strong Buy' else '#c4ddb8'};
+                  font-family:'Courier New',monospace;font-size:10px;font-weight:bold;">
+                  {r['signal']}
+                </span>
+              </td>
+              <td style="padding:10px 12px;font-family:'Courier New',monospace;font-size:12px;color:#1a1008;white-space:nowrap;">
+                $<b>{r['price']:.2f}</b><br>
+                <span style="color:#5c4a35;font-size:11px;">Entry: ${r['entry_low']:.2f}–${r['entry_high']:.2f}</span>
+              </td>
+              <td style="padding:10px 12px;font-family:'Courier New',monospace;font-size:11px;white-space:nowrap;">
+                <span style="color:#7a2020;">Stop: ${r['stop']:.2f}</span><br>
+                <span style="color:#2d5a27;">T1: ${r['t1']:.2f} / T2: ${r['t2']:.2f}</span>
+              </td>
+              <td style="padding:10px 12px;font-family:'Courier New',monospace;font-size:12px;
+                color:{rr_color};font-weight:bold;text-align:center;">
+                {r['rr']:.1f}:1
+              </td>
+              <td style="padding:10px 12px;font-size:11px;color:#5c4a35;white-space:nowrap;">
+                {r.get('lynch_cat','—')}<br>
+                PEG: {peg_str}<br>
+                <span style="color:{ytd_color};">YTD {ytd_str}</span>
+              </td>
+              <td style="padding:10px 12px;font-size:11px;color:#5c4a35;">
+                {vol_arrow} {r.get('vol_label','—')}<br>
+                <span style="color:#2c2419;">{r.get('obv_signal','')[:40]}</span>
+              </td>
+            </tr>
+            <tr style="background:#faf7f1;border-bottom:2px solid #d4c9b8;">
+              <td colspan="8" style="padding:8px 12px 12px 12px;font-family:Georgia,serif;
+                font-size:12px;color:#2c2419;line-height:1.6;">
+                <b style="color:#5c4a35;">Alert:</b> {r['alert']}<br>
+                <b style="color:#5c4a35;">Thesis:</b> {r['thesis']}
+              </td>
+            </tr>"""
+
+    strong_buy_count = sum(1 for r in actionable if r["signal"] == "Strong Buy")
+    buy_count = len(actionable) - strong_buy_count
+
+    html = f"""<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f4efe6;font-family:Georgia,serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4efe6;">
+<tr><td align="center" style="padding:24px 16px;">
+<table width="700" cellpadding="0" cellspacing="0" style="background:#faf7f1;border:1px solid #d4c9b8;border-radius:6px;overflow:hidden;">
+
+  <!-- Header -->
+  <tr style="background:#1a1008;">
+    <td style="padding:20px 28px;">
+      <div style="font-family:Georgia,serif;font-size:20px;font-weight:bold;color:#f4efe6;">
+        Market Scanner
+      </div>
+      <div style="font-family:'Courier New',monospace;font-size:12px;color:#8a7560;margin-top:4px;">
+        {period} &nbsp;|&nbsp; {subject_date} &nbsp;|&nbsp; Technical + Volume + Lynch
+      </div>
+    </td>
+    <td style="padding:20px 28px;text-align:right;vertical-align:middle;">
+      <div style="font-family:'Courier New',monospace;font-size:11px;color:#5c4a35;">
+        <span style="color:#d4edda;">{strong_buy_count} Strong Buy</span> &nbsp;
+        <span style="color:#c4ddb8;">{buy_count} Buy</span>
+      </div>
+    </td>
+  </tr>
+
+  <!-- Summary bar -->
+  <tr style="background:#ede8de;border-bottom:1px solid #d4c9b8;">
+    <td colspan="2" style="padding:10px 28px;font-family:'Courier New',monospace;font-size:11px;color:#5c4a35;">
+      Showing {len(actionable)} actionable signals &nbsp;|&nbsp;
+      Strong Buys + Buys with R:R &ge; 2.0 &nbsp;|&nbsp;
+      Sorted by composite score &nbsp;|&nbsp;
+      Click entry prices to verify on your broker before trading
+    </td>
+  </tr>
+
+  <!-- Main table -->
+  <tr><td colspan="2" style="padding:0;">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr style="background:#ede8de;">
+        <th style="padding:8px 12px;text-align:left;font-family:'Courier New',monospace;font-size:10px;color:#5c4a35;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid #d4c9b8;">Ticker</th>
+        <th style="padding:8px 12px;text-align:left;font-family:'Courier New',monospace;font-size:10px;color:#5c4a35;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid #d4c9b8;">Name</th>
+        <th style="padding:8px 12px;text-align:left;font-family:'Courier New',monospace;font-size:10px;color:#5c4a35;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid #d4c9b8;">Signal</th>
+        <th style="padding:8px 12px;text-align:left;font-family:'Courier New',monospace;font-size:10px;color:#5c4a35;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid #d4c9b8;">Price / Entry</th>
+        <th style="padding:8px 12px;text-align:left;font-family:'Courier New',monospace;font-size:10px;color:#5c4a35;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid #d4c9b8;">Stop / Targets</th>
+        <th style="padding:8px 12px;text-align:center;font-family:'Courier New',monospace;font-size:10px;color:#5c4a35;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid #d4c9b8;">R:R</th>
+        <th style="padding:8px 12px;text-align:left;font-family:'Courier New',monospace;font-size:10px;color:#5c4a35;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid #d4c9b8;">Lynch / PEG</th>
+        <th style="padding:8px 12px;text-align:left;font-family:'Courier New',monospace;font-size:10px;color:#5c4a35;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid #d4c9b8;">Volume</th>
+      </tr>
+      {rows_html}
+    </table>
+  </td></tr>
+
+  <!-- R:R explainer -->
+  <tr style="background:#ede8de;border-top:2px solid #d4c9b8;">
+    <td colspan="2" style="padding:14px 28px;">
+      <div style="font-family:Georgia,serif;font-size:12px;color:#5c4a35;line-height:1.6;">
+        <b>R:R (Risk to Reward)</b> — A 2:1 ratio means you risk $1 to potentially make $2.
+        Only trade setups with R:R &ge; 2:1. Below that, the math doesn't justify the risk
+        regardless of how strong the thesis sounds. Position size shown is % of total portfolio.
+      </div>
+    </td>
+  </tr>
+
+  <!-- Footer -->
+  <tr style="background:#1a1008;">
+    <td colspan="2" style="padding:14px 28px;font-family:'Courier New',monospace;font-size:10px;color:#5c4a35;line-height:1.6;">
+      Not financial advice. All signals are algorithmic estimates. Always do your own due diligence before trading.
+      Data: Yahoo Finance. Full dashboard: https://gtmautomationops-dev.github.io/market-scanner/
+    </td>
+  </tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>"""
+
+    return html, f"Market Scanner — {period} Signals — {subject_date}"
+
+
 # ─── MAIN ─────────────────────────────────────────────────────────────────────
 
 def run_scan():
@@ -986,6 +1161,12 @@ def run_scan():
     out.mkdir(exist_ok=True)
     (out / "index.html").write_text(html, encoding="utf-8")
     print(f"Done. Dashboard written to docs/index.html")
+
+    email_html, subject = generate_email_html(results, updated)
+    (out / "email_alert.html").write_text(email_html, encoding="utf-8")
+    (out / "email_subject.txt").write_text(subject, encoding="utf-8")
+    print(f"Email alert written to docs/email_alert.html")
+    print(f"Subject: {subject}")
 
 
 if __name__ == "__main__":
