@@ -931,173 +931,200 @@ filterAndRender();
 
 def generate_email_html(results, updated):
     """
-    Build an HTML email showing actionable signals only:
-    all Strong Buys + Buys with R:R >= 2.0, sorted by composite score.
+    Mobile-first card layout. Top 15 signals only.
+    Priority: Strong Buy + R:R>=2, then Strong Buy any R:R, then Buy + R:R>=2.
+    Font: Calibri/system stack. Single column. No tables for layout.
     """
-    actionable = [
-        r for r in results
-        if r["signal"] == "Strong Buy"
-        or (r["signal"] == "Buy" and r["rr"] >= 2.0)
-    ]
-    actionable.sort(key=lambda x: -x["composite"])
-
     now_et = datetime.now(ZoneInfo("America/New_York"))
     period = "Morning Open" if now_et.hour < 14 else "Afternoon Close"
     subject_date = now_et.strftime("%B %d, %Y")
 
-    def row_color(signal):
-        return "#d4edda" if signal == "Strong Buy" else "#ddefd6"
-
-    def peg_color(peg):
-        if peg is None:
-            return "#5c4a35"
-        return "#2d5a27" if peg < 1 else "#7a2020" if peg > 2 else "#6b5400"
-
-    rows_html = ""
-    if not actionable:
-        rows_html = """
-        <tr><td colspan="8" style="padding:24px;text-align:center;color:#8a7560;
-            font-family:Georgia,serif;font-size:14px;">
-            No actionable signals at this scan. Market conditions are mixed — patience is a position.
-        </td></tr>"""
-    else:
-        for r in actionable:
-            bg = row_color(r["signal"])
-            peg_str = f'<span style="color:{peg_color(r["peg"])}">{r["peg"]:.2f}</span>' if r["peg"] else "—"
-            ytd_color = "#2d5a27" if r["ytd"] >= 0 else "#7a2020"
-            ytd_str = f'{"+" if r["ytd"]>=0 else ""}{r["ytd"]:.1f}%'
-            vol_arrow = "▲" if "Accum" in (r["vol_label"] or "") else "▼" if "Distrib" in (r["vol_label"] or "") else "–"
-            rr_color = "#2d5a27" if r["rr"] >= 2 else "#6b5400"
-
-            rows_html += f"""
-            <tr style="background:{bg};border-bottom:1px solid #d4c9b8;">
-              <td style="padding:10px 12px;font-family:'Courier New',monospace;font-size:13px;font-weight:bold;color:#1a1008;white-space:nowrap;">
-                {r['ticker']}
-              </td>
-              <td style="padding:10px 12px;font-family:Georgia,serif;font-size:12px;color:#2c2419;max-width:160px;">
-                {r['name']}
-              </td>
-              <td style="padding:10px 12px;text-align:center;">
-                <span style="display:inline-block;padding:2px 8px;border-radius:3px;
-                  background:{'#d4edda' if r['signal']=='Strong Buy' else '#ddefd6'};
-                  color:{'#1a4a1a' if r['signal']=='Strong Buy' else '#2d5a27'};
-                  border:1px solid {'#b8d9c0' if r['signal']=='Strong Buy' else '#c4ddb8'};
-                  font-family:'Courier New',monospace;font-size:10px;font-weight:bold;">
-                  {r['signal']}
-                </span>
-              </td>
-              <td style="padding:10px 12px;font-family:'Courier New',monospace;font-size:12px;color:#1a1008;white-space:nowrap;">
-                $<b>{r['price']:.2f}</b><br>
-                <span style="color:#5c4a35;font-size:11px;">Entry: ${r['entry_low']:.2f}–${r['entry_high']:.2f}</span>
-              </td>
-              <td style="padding:10px 12px;font-family:'Courier New',monospace;font-size:11px;white-space:nowrap;">
-                <span style="color:#7a2020;">Stop: ${r['stop']:.2f}</span><br>
-                <span style="color:#2d5a27;">T1: ${r['t1']:.2f} / T2: ${r['t2']:.2f}</span>
-              </td>
-              <td style="padding:10px 12px;font-family:'Courier New',monospace;font-size:12px;
-                color:{rr_color};font-weight:bold;text-align:center;">
-                {r['rr']:.1f}:1
-              </td>
-              <td style="padding:10px 12px;font-size:11px;color:#5c4a35;white-space:nowrap;">
-                {r.get('lynch_cat','—')}<br>
-                PEG: {peg_str}<br>
-                <span style="color:{ytd_color};">YTD {ytd_str}</span>
-              </td>
-              <td style="padding:10px 12px;font-size:11px;color:#5c4a35;">
-                {vol_arrow} {r.get('vol_label','—')}<br>
-                <span style="color:#2c2419;">{r.get('obv_signal','')[:40]}</span>
-              </td>
-            </tr>
-            <tr style="background:#faf7f1;border-bottom:2px solid #d4c9b8;">
-              <td colspan="8" style="padding:8px 12px 12px 12px;font-family:Georgia,serif;
-                font-size:12px;color:#2c2419;line-height:1.6;">
-                <b style="color:#5c4a35;">Alert:</b> {r['alert']}<br>
-                <b style="color:#5c4a35;">Thesis:</b> {r['thesis']}
-              </td>
-            </tr>"""
+    # Priority tiers — capped at 15 total to stay under Gmail's 102KB clip
+    tier1 = [r for r in results if r["signal"] == "Strong Buy" and r["rr"] >= 2.0]
+    tier2 = [r for r in results if r["signal"] == "Strong Buy" and r["rr"] < 2.0]
+    tier3 = [r for r in results if r["signal"] == "Buy" and r["rr"] >= 2.0]
+    for t in (tier1, tier2, tier3):
+        t.sort(key=lambda x: -x["composite"])
+    actionable = (tier1 + tier2 + tier3)[:15]
 
     strong_buy_count = sum(1 for r in actionable if r["signal"] == "Strong Buy")
     buy_count = len(actionable) - strong_buy_count
 
+    F = "Calibri, 'Gill Sans', Arial, sans-serif"
+
+    def tag(signal):
+        if signal == "Strong Buy":
+            return (f'<span style="background:#1a4a1a;color:#d4edda;padding:3px 10px;'
+                    f'border-radius:4px;font-size:12px;font-weight:700;font-family:{F};">'
+                    f'STRONG BUY</span>')
+        return (f'<span style="background:#2d5a27;color:#fff;padding:3px 10px;'
+                f'border-radius:4px;font-size:12px;font-weight:700;font-family:{F};">'
+                f'BUY</span>')
+
+    def rr_color(rr):
+        return "#1a6b1a" if rr >= 2 else "#c47a00"
+
+    def peg_str(peg):
+        if peg is None:
+            return "—"
+        color = "#1a6b1a" if peg < 1 else "#c47a00" if peg < 2 else "#b02020"
+        return f'<span style="color:{color};font-weight:700;">{peg:.2f}</span>'
+
+    def vol_icon(lbl):
+        if not lbl:
+            return "—"
+        if "Accum" in lbl or "Strong" in lbl:
+            return f"&#9650; {lbl}"
+        if "Distrib" in lbl:
+            return f"&#9660; {lbl}"
+        return lbl
+
+    cards = ""
+    if not actionable:
+        cards = (f'<p style="font-family:{F};font-size:15px;color:#555;text-align:center;'
+                 f'padding:32px 16px;">No actionable signals today. '
+                 f'Market conditions are mixed &mdash; patience is a position.</p>')
+    else:
+        for i, r in enumerate(actionable):
+            ytd_color = "#1a6b1a" if r["ytd"] >= 0 else "#b02020"
+            ytd_str = f'{"+" if r["ytd"]>=0 else ""}{r["ytd"]:.1f}%'
+            border_color = "#1a4a1a" if r["signal"] == "Strong Buy" else "#2d5a27"
+            thesis_short = r["thesis"][:180] + "..." if len(r["thesis"]) > 180 else r["thesis"]
+
+            cards += f"""
+<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;border:1px solid #ddd;border-left:4px solid {border_color};border-radius:6px;background:#ffffff;font-family:{F};">
+
+  <!-- Card header: rank + ticker + signal -->
+  <tr>
+    <td style="padding:14px 16px 10px 16px;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="vertical-align:middle;">
+            <span style="font-size:11px;color:#888;font-family:{F};">#{i+1}</span>&nbsp;
+            <span style="font-size:22px;font-weight:700;color:#111;font-family:{F};">{r['ticker']}</span>&nbsp;
+            <span style="font-size:14px;color:#444;font-family:{F};">{r['name']}</span>
+          </td>
+          <td style="text-align:right;vertical-align:middle;white-space:nowrap;">
+            {tag(r['signal'])}
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Tags row: Lynch, PEG, YTD, Volume -->
+  <tr>
+    <td style="padding:0 16px 12px 16px;">
+      <span style="font-size:12px;color:#555;font-family:{F};">
+        {r.get('lynch_cat','—')} &nbsp;&bull;&nbsp;
+        PEG {peg_str(r['peg'])} &nbsp;&bull;&nbsp;
+        YTD <span style="color:{ytd_color};font-weight:600;">{ytd_str}</span> &nbsp;&bull;&nbsp;
+        {vol_icon(r.get('vol_label',''))}
+      </span>
+    </td>
+  </tr>
+
+  <!-- Divider -->
+  <tr><td style="border-top:1px solid #eee;"></td></tr>
+
+  <!-- Price grid: 4 columns -->
+  <tr>
+    <td style="padding:12px 16px;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="width:25%;padding-right:8px;vertical-align:top;">
+            <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.06em;font-family:{F};margin-bottom:3px;">Entry Zone</div>
+            <div style="font-size:15px;font-weight:700;color:#111;font-family:{F};">${r['entry_low']:.2f}</div>
+            <div style="font-size:13px;color:#555;font-family:{F};">to ${r['entry_high']:.2f}</div>
+          </td>
+          <td style="width:25%;padding-right:8px;vertical-align:top;">
+            <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.06em;font-family:{F};margin-bottom:3px;">Stop Loss</div>
+            <div style="font-size:15px;font-weight:700;color:#b02020;font-family:{F};">${r['stop']:.2f}</div>
+            <div style="font-size:11px;color:#888;font-family:{F};">Exit if broken</div>
+          </td>
+          <td style="width:25%;padding-right:8px;vertical-align:top;">
+            <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.06em;font-family:{F};margin-bottom:3px;">Targets</div>
+            <div style="font-size:13px;color:#1a6b1a;font-weight:600;font-family:{F};">T1 ${r['t1']:.2f}</div>
+            <div style="font-size:13px;color:#1a6b1a;font-family:{F};">T2 ${r['t2']:.2f}</div>
+          </td>
+          <td style="width:25%;vertical-align:top;">
+            <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.06em;font-family:{F};margin-bottom:3px;">R:R &nbsp;|&nbsp; Size</div>
+            <div style="font-size:18px;font-weight:700;color:{rr_color(r['rr'])};font-family:{F};">{r['rr']:.1f}:1</div>
+            <div style="font-size:11px;color:#555;font-family:{F};">{r['position_size']} portfolio</div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Alert -->
+  <tr>
+    <td style="padding:0 16px 10px 16px;">
+      <div style="background:#f5f5f5;border-radius:4px;padding:10px 12px;font-size:13px;color:#333;font-family:{F};line-height:1.5;">
+        <span style="font-weight:700;color:#444;">When to act:</span> {r['alert']}
+      </div>
+    </td>
+  </tr>
+
+  <!-- Thesis -->
+  <tr>
+    <td style="padding:0 16px 14px 16px;">
+      <div style="font-size:12px;color:#666;line-height:1.6;font-family:{F};">{thesis_short}</div>
+    </td>
+  </tr>
+
+</table>"""
+
     html = f"""<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;background:#f4efe6;font-family:Georgia,serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4efe6;">
-<tr><td align="center" style="padding:24px 16px;">
-<table width="700" cellpadding="0" cellspacing="0" style="background:#faf7f1;border:1px solid #d4c9b8;border-radius:6px;overflow:hidden;">
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body {{ margin:0;padding:0;background:#f0f0f0; }}
+  @media only screen and (max-width:600px) {{
+    .outer {{ padding:12px 8px !important; }}
+    .container {{ border-radius:0 !important; }}
+  }}
+</style>
+</head>
+<body>
+<div class="outer" style="background:#f0f0f0;padding:24px 16px;">
+<div class="container" style="max-width:600px;margin:0 auto;background:#f8f8f8;border-radius:8px;overflow:hidden;font-family:{F};">
 
   <!-- Header -->
-  <tr style="background:#1a1008;">
-    <td style="padding:20px 28px;">
-      <div style="font-family:Georgia,serif;font-size:20px;font-weight:bold;color:#f4efe6;">
-        Market Scanner
-      </div>
-      <div style="font-family:'Courier New',monospace;font-size:12px;color:#8a7560;margin-top:4px;">
-        {period} &nbsp;|&nbsp; {subject_date} &nbsp;|&nbsp; Technical + Volume + Lynch
-      </div>
-    </td>
-    <td style="padding:20px 28px;text-align:right;vertical-align:middle;">
-      <div style="font-family:'Courier New',monospace;font-size:11px;color:#5c4a35;">
-        <span style="color:#d4edda;">{strong_buy_count} Strong Buy</span> &nbsp;
-        <span style="color:#c4ddb8;">{buy_count} Buy</span>
-      </div>
-    </td>
-  </tr>
+  <div style="background:#111;padding:20px 20px 16px 20px;">
+    <div style="font-size:20px;font-weight:700;color:#fff;font-family:{F};letter-spacing:-0.3px;">Market Scanner</div>
+    <div style="font-size:13px;color:#888;margin-top:4px;font-family:{F};">{period} &nbsp;&middot;&nbsp; {subject_date} &nbsp;&middot;&nbsp; Technical + Volume + Lynch</div>
+  </div>
 
-  <!-- Summary bar -->
-  <tr style="background:#ede8de;border-bottom:1px solid #d4c9b8;">
-    <td colspan="2" style="padding:10px 28px;font-family:'Courier New',monospace;font-size:11px;color:#5c4a35;">
-      Showing {len(actionable)} actionable signals &nbsp;|&nbsp;
-      Strong Buys + Buys with R:R &ge; 2.0 &nbsp;|&nbsp;
-      Sorted by composite score &nbsp;|&nbsp;
-      Click entry prices to verify on your broker before trading
-    </td>
-  </tr>
+  <!-- Summary strip -->
+  <div style="background:#222;padding:10px 20px;font-family:{F};font-size:13px;">
+    <span style="color:#6fcf6f;font-weight:700;">{strong_buy_count} Strong Buy</span>
+    <span style="color:#555;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+    <span style="color:#a8d8a8;">{buy_count} Buy</span>
+    <span style="color:#555;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+    <span style="color:#666;">Top {len(actionable)} signals &middot; Sorted by priority</span>
+  </div>
 
-  <!-- Main table -->
-  <tr><td colspan="2" style="padding:0;">
-    <table width="100%" cellpadding="0" cellspacing="0">
-      <tr style="background:#ede8de;">
-        <th style="padding:8px 12px;text-align:left;font-family:'Courier New',monospace;font-size:10px;color:#5c4a35;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid #d4c9b8;">Ticker</th>
-        <th style="padding:8px 12px;text-align:left;font-family:'Courier New',monospace;font-size:10px;color:#5c4a35;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid #d4c9b8;">Name</th>
-        <th style="padding:8px 12px;text-align:left;font-family:'Courier New',monospace;font-size:10px;color:#5c4a35;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid #d4c9b8;">Signal</th>
-        <th style="padding:8px 12px;text-align:left;font-family:'Courier New',monospace;font-size:10px;color:#5c4a35;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid #d4c9b8;">Price / Entry</th>
-        <th style="padding:8px 12px;text-align:left;font-family:'Courier New',monospace;font-size:10px;color:#5c4a35;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid #d4c9b8;">Stop / Targets</th>
-        <th style="padding:8px 12px;text-align:center;font-family:'Courier New',monospace;font-size:10px;color:#5c4a35;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid #d4c9b8;">R:R</th>
-        <th style="padding:8px 12px;text-align:left;font-family:'Courier New',monospace;font-size:10px;color:#5c4a35;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid #d4c9b8;">Lynch / PEG</th>
-        <th style="padding:8px 12px;text-align:left;font-family:'Courier New',monospace;font-size:10px;color:#5c4a35;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid #d4c9b8;">Volume</th>
-      </tr>
-      {rows_html}
-    </table>
-  </td></tr>
-
-  <!-- R:R explainer -->
-  <tr style="background:#ede8de;border-top:2px solid #d4c9b8;">
-    <td colspan="2" style="padding:14px 28px;">
-      <div style="font-family:Georgia,serif;font-size:12px;color:#5c4a35;line-height:1.6;">
-        <b>R:R (Risk to Reward)</b> — A 2:1 ratio means you risk $1 to potentially make $2.
-        Only trade setups with R:R &ge; 2:1. Below that, the math doesn't justify the risk
-        regardless of how strong the thesis sounds. Position size shown is % of total portfolio.
-      </div>
-    </td>
-  </tr>
+  <!-- Cards -->
+  <div style="padding:16px 12px;">
+    {cards}
+  </div>
 
   <!-- Footer -->
-  <tr style="background:#1a1008;">
-    <td colspan="2" style="padding:14px 28px;font-family:'Courier New',monospace;font-size:10px;color:#5c4a35;line-height:1.6;">
-      Not financial advice. All signals are algorithmic estimates. Always do your own due diligence before trading.
-      Data: Yahoo Finance. Full dashboard: https://gtmautomationops-dev.github.io/market-scanner/
-    </td>
-  </tr>
+  <div style="background:#111;padding:14px 20px;font-size:11px;color:#555;line-height:1.7;font-family:{F};">
+    R:R = Risk to Reward. Only trade setups with R:R &ge; 2:1 &mdash; risk $1 to make $2+.<br>
+    Not financial advice. Always verify on your broker before acting.<br>
+    <a href="https://gtmautomationops-dev.github.io/market-scanner/" style="color:#6fcf6f;">Full dashboard &rarr;</a>
+  </div>
 
-</table>
-</td></tr>
-</table>
+</div>
+</div>
 </body>
 </html>"""
 
-    return html, f"Market Scanner — {period} Signals — {subject_date}"
+    return html, f"Market Scanner — {period} — {subject_date}"
 
 
 # ─── MAIN ─────────────────────────────────────────────────────────────────────
