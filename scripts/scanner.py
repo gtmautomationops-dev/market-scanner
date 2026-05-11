@@ -1024,8 +1024,24 @@ def generate_email_html(results, updated):
     </td>
   </tr>
 
-  <!-- Divider -->
-  <tr><td style="border-top:1px solid #eee;"></td></tr>
+  <!-- Current price bar -->
+  <tr>
+    <td style="background:#f0f0f0;padding:10px 16px;border-top:1px solid #e0e0e0;border-bottom:1px solid #e0e0e0;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="vertical-align:middle;">
+            <span style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.06em;font-family:{F};">Current Price</span>
+            <span style="font-size:22px;font-weight:700;color:#111;font-family:{F};margin-left:10px;">${r['price']:.2f}</span>
+          </td>
+          <td style="text-align:right;vertical-align:middle;">
+            <span style="font-size:12px;color:#888;font-family:{F};">
+              {'&#9650; Entry is below current — wait for pullback' if r['entry_high'] < r['price'] else '&#9989; Price is in entry zone now'}
+            </span>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
 
   <!-- Price grid: 4 columns -->
   <tr>
