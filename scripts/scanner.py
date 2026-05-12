@@ -256,18 +256,18 @@ def classify_lynch(info, hist_closes):
     elif eg > 0 and sector in CYCLICAL_SECTORS:
         category = "Cyclical"
         details["category_desc"] = "Profits tied to economic cycle. Buy near cycle trough, sell near peak."
-    elif eg < 0 and profit_margin and profit_margin > -0.05:
+    elif eg < 0:
         category = "Turnaround"
         details["category_desc"] = "Currently struggling. Lynch looks for catalyst and improving cash flow."
-    elif div_yield > 0.04 and eg < 10:
-        category = "Slow Grower"
-        details["category_desc"] = "Low growth, income-focused. Lynch owns for yield, not capital gains."
     elif total_cash > market_cap * 0.3 and market_cap > 0:
         category = "Asset Play"
         details["category_desc"] = "Assets worth more than market price. Lynch hunts hidden balance sheet value."
+    elif div_yield > 0.02 or eg < 10:
+        category = "Slow Grower"
+        details["category_desc"] = "Low/flat growth. Lynch holds only for yield or if deeply undervalued."
     else:
-        category = "Stalwart"
-        details["category_desc"] = "Solid large-cap. Moderate growth expectations."
+        category = "Slow Grower"
+        details["category_desc"] = "Low/flat growth. Not a Lynch pick unless PEG is very cheap."
 
     # --- PEG scoring (Lynch's primary metric) ---
     if peg is not None and peg > 0:
@@ -502,6 +502,11 @@ def score_ticker(ticker, info, hist):
         else:
             composite = tech_score * 0.4 + vol_score * 0.2 + lynch_score * 0.4
 
+        entry_low, entry_high, entry_mid, stop, t1, t2, rr, position_size, setup, alert = (
+            compute_entry_exit(current, closes, price_vs_ma20, range_pct, composite)
+        )
+
+        # Base signal from composite score
         if composite >= 3.0:
             signal, signal_class = "Strong Buy", "strong-buy"
         elif composite >= 1.0:
@@ -511,9 +516,11 @@ def score_ticker(ticker, info, hist):
         else:
             signal, signal_class = "Caution", "caution"
 
-        entry_low, entry_high, entry_mid, stop, t1, t2, rr, position_size, setup, alert = (
-            compute_entry_exit(current, closes, price_vs_ma20, range_pct, composite)
-        )
+        # Cap signal based on R:R — strong fundamentals with a bad entry is still "wait"
+        if rr < 1.0 and signal in ("Strong Buy", "Buy"):
+            signal, signal_class = "Hold", "hold"
+        elif rr < 1.5 and signal == "Strong Buy":
+            signal, signal_class = "Buy", "buy"
 
         name = info.get("longName") or info.get("shortName") or ticker
         sector = info.get("sector", "")
