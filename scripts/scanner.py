@@ -40,8 +40,6 @@ US_STOCKS = [
     "SOFI", "RDDT", "OPEN",
     # AI power infrastructure
     "VRT", "VST", "CEG", "TLN", "DLR", "IRM", "WMB", "ET",
-    # Memory
-    "DRAM",
 ]
 
 US_ETFS = [
@@ -53,7 +51,7 @@ US_ETFS = [
     "GLD", "SLV", "USO", "UNG", "PDBC",
     "EFA", "EEM", "FXI", "EWJ", "EWZ", "KWEB",
     "TQQQ", "SOXL", "UPRO",
-    "AIPO",
+    "AIPO", "DRAM",
 ]
 
 CA_STOCKS = [
@@ -80,7 +78,7 @@ CA_ETFS = [
     "XEQT.TO", "VEQT.TO", "ZEQT.TO",
 ]
 
-ETF_SET = set(US_ETFS + CA_ETFS)
+ETF_SET = set(US_ETFS + CA_ETFS + ["DRAM"])
 
 BOND_ETF_SET = {
     "AGG", "BND", "TLT", "IEF", "SHY", "HYG", "JNK", "LQD", "EMB",
