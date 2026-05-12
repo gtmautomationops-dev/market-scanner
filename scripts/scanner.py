@@ -249,7 +249,17 @@ def classify_lynch(info, hist_closes):
     details["profit_margin"] = round((profit_margin or 0) * 100, 1)
     details["div_yield"] = round(div_yield * 100, 2)
 
+    trailing_eps = info.get("trailingEps")
+    is_loss_making = (
+        (trailing_eps is not None and trailing_eps < 0) or
+        (pe is None and roe is not None and roe < -0.05) or
+        (profit_margin is not None and profit_margin < -0.05)
+    )
+
     eg = (eps_growth or 0) * 100  # as percentage
+    # If company is clearly losing money but yfinance returns no growth data, force negative
+    if is_loss_making and eps_growth is None:
+        eg = -1.0
 
     # --- Classify ---
     if eg > 20 and (debt_eq is None or debt_eq < 100):
