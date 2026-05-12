@@ -648,9 +648,9 @@ tr.section-header td { background:var(--surface2); font-family:var(--serif); fon
 .mc { font-family:var(--mono); text-align:right; font-size:12px; color:var(--ink2); }
 .ytd-pos { color:var(--green); }
 .ytd-neg { color:var(--red); }
-.rr-good { color:var(--green); font-weight:500; }
-.rr-ok { color:var(--ink3); }
-.rr-bad { color:var(--red); }
+.rr-good { background:var(--green-bg); color:var(--green-dk); font-weight:700; border:1px solid var(--green-bd); border-radius:4px; padding:1px 6px; }
+.rr-ok   { background:#f0ece4; color:var(--ink3); font-weight:500; border:1px solid var(--border); border-radius:4px; padding:1px 6px; }
+.rr-bad  { background:var(--red-bg); color:var(--red); font-weight:600; border:1px solid var(--red-bd); border-radius:4px; padding:1px 6px; }
 .peg-good { color:var(--green); font-weight:500; }
 .peg-fair { color:var(--gold); }
 .peg-bad { color:var(--red); }
