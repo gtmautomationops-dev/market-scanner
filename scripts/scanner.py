@@ -38,6 +38,8 @@ US_STOCKS = [
     "AI", "IONQ", "RGTI", "QBTS", "BBAI", "SOUN", "IREN", "CORZ", "APLD",
     "NBIS", "LITE", "AAOI", "SIVEF", "AXTI", "AEHR", "FLNC", "ABB",
     "SOFI", "RDDT", "OPEN",
+    # AI power infrastructure
+    "VRT", "VST", "CEG", "TLN", "DLR", "IRM", "WMB", "ET",
 ]
 
 US_ETFS = [
@@ -49,6 +51,7 @@ US_ETFS = [
     "GLD", "SLV", "USO", "UNG", "PDBC",
     "EFA", "EEM", "FXI", "EWJ", "EWZ", "KWEB",
     "TQQQ", "SOXL", "UPRO",
+    "AIPO",
 ]
 
 CA_STOCKS = [
