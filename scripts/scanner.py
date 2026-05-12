@@ -77,6 +77,11 @@ CA_ETFS = [
 
 ETF_SET = set(US_ETFS + CA_ETFS)
 
+BOND_ETF_SET = {
+    "AGG", "BND", "TLT", "IEF", "SHY", "HYG", "JNK", "LQD", "EMB",
+    "XBB.TO", "ZAG.TO", "VAB.TO", "XSB.TO",
+}
+
 CYCLICAL_SECTORS = {"Energy", "Basic Materials", "Consumer Cyclical", "Industrials", "Financial Services"}
 DEFENSIVE_SECTORS = {"Consumer Defensive", "Healthcare", "Utilities", "Real Estate"}
 
@@ -353,6 +358,13 @@ def classify_lynch(info, hist_closes):
 
 # ─── ENTRY / EXIT LOGIC ───────────────────────────────────────────────────────
 
+def compute_atr(closes, period=14):
+    if len(closes) < period + 1:
+        return closes[-1] * 0.02
+    true_ranges = [abs(closes[i] - closes[i - 1]) for i in range(1, len(closes))]
+    return sum(true_ranges[-period:]) / period
+
+
 def compute_entry_exit(current, closes, price_vs_ma20, range_pct, score):
     if range_pct > 0.85 or price_vs_ma20 > 12:
         entry_low = current * 0.85
@@ -371,13 +383,19 @@ def compute_entry_exit(current, closes, price_vs_ma20, range_pct, score):
         alert = f"Buy ${entry_low:.2f}–${entry_high:.2f} on next pullback with above-avg volume"
 
     entry_mid = (entry_low + entry_high) / 2
-    high_52w = max(closes[-252:]) if len(closes) >= 252 else max(closes)
-    low_52w = min(closes[-252:]) if len(closes) >= 252 else min(closes)
-    volatility = (high_52w - low_52w) / low_52w if low_52w > 0 else 0.3
-    stop_pct = max(0.08, min(0.18, volatility * 0.25))
+
+    # ATR-based stop: 2× ATR below entry, clamped 6–20% so it reflects real volatility
+    atr = compute_atr(closes)
+    atr_stop = (2 * atr) / entry_mid
+    stop_pct = max(0.06, min(0.20, atr_stop))
     stop = entry_mid * (1 - stop_pct)
-    t1 = entry_mid * 1.175
-    t2 = entry_mid * 1.35
+
+    # Targets: swing-high resistance as T1, 2× extension as T2
+    recent = closes[-60:] if len(closes) >= 60 else closes
+    swing_highs = sorted([h for h in recent if h > entry_mid * 1.05], )
+    t1 = swing_highs[len(swing_highs) // 2] if swing_highs else entry_mid * (1 + stop_pct * 2.5)
+    t2 = entry_mid + (t1 - entry_mid) * 2
+
     risk = entry_mid - stop
     rr = (t1 - entry_mid) / risk if risk > 0 else 0
     position_size = "4-5%" if score >= 6 else "3-4%" if score >= 3 else "1-2%"
@@ -519,8 +537,13 @@ def score_ticker(ticker, info, hist):
         # Cap signal based on R:R — strong fundamentals with a bad entry is still "wait"
         if rr < 1.0 and signal in ("Strong Buy", "Buy"):
             signal, signal_class = "Hold", "hold"
-        elif rr < 1.5 and signal == "Strong Buy":
+        elif rr < 2.0 and signal == "Strong Buy":
             signal, signal_class = "Buy", "buy"
+
+        # Bond ETFs are income instruments — cap at Hold, not tradeable as buy signals
+        if ticker in BOND_ETF_SET:
+            if signal in ("Strong Buy", "Buy"):
+                signal, signal_class = "Hold", "hold"
 
         name = info.get("longName") or info.get("shortName") or ticker
         sector = info.get("sector", "")
