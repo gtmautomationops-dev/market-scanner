@@ -40,6 +40,8 @@ US_STOCKS = [
     "SOFI", "RDDT", "OPEN",
     # AI power infrastructure
     "VRT", "VST", "CEG", "TLN", "DLR", "IRM", "WMB", "ET",
+    # Memory
+    "DRAM",
 ]
 
 US_ETFS = [
