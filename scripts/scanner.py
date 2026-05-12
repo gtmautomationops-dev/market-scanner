@@ -34,6 +34,10 @@ US_STOCKS = [
     "AMT", "PLD", "CCI", "EQIX", "PSA", "EXR", "AVB", "EQR",
     "NEM", "FCX", "GOLD", "AA", "NUE", "RS",
     "NEE", "SO", "DUK", "AEP", "D", "EXC", "XEL", "WEC", "AWK",
+    # AI / next-gen tech
+    "AI", "IONQ", "RGTI", "QBTS", "BBAI", "SOUN", "IREN", "CORZ", "APLD",
+    "NBIS", "LITE", "AAOI", "SIVEF", "AXTI", "AEHR", "FLNC", "ABB",
+    "SOFI", "RDDT", "OPEN",
 ]
 
 US_ETFS = [
@@ -648,9 +652,9 @@ tr.section-header td { background:var(--surface2); font-family:var(--serif); fon
 .mc { font-family:var(--mono); text-align:right; font-size:12px; color:var(--ink2); }
 .ytd-pos { color:var(--green); }
 .ytd-neg { color:var(--red); }
-.rr-good { background:var(--green-bg); color:var(--green-dk); font-weight:700; border:1px solid var(--green-bd); border-radius:4px; padding:1px 6px; }
-.rr-ok   { background:#f0ece4; color:var(--ink3); font-weight:500; border:1px solid var(--border); border-radius:4px; padding:1px 6px; }
-.rr-bad  { background:var(--red-bg); color:var(--red); font-weight:600; border:1px solid var(--red-bd); border-radius:4px; padding:1px 6px; }
+.rr-good { background:var(--green-bg); color:var(--green-dk); font-weight:700; border:1px solid var(--green-bd); }
+.rr-ok   { background:#f0ece4;         color:var(--ink3);    font-weight:500; border:1px solid var(--border); }
+.rr-bad  { background:var(--red-bg);   color:var(--red);     font-weight:700; border:1px solid var(--red-bd); }
 .peg-good { color:var(--green); font-weight:500; }
 .peg-fair { color:var(--gold); }
 .peg-bad { color:var(--red); }
@@ -819,7 +823,7 @@ function detail(d) {
       <div class="ee"><h4>Stop</h4><div class="ev sv">$${d.stop.toFixed(2)}</div><div class="es">Exit if breaks</div></div>
       <div class="ee"><h4>Target 1</h4><div class="ev tv">$${d.t1.toFixed(2)}</div><div class="es">Scale 50%</div></div>
       <div class="ee"><h4>Target 2</h4><div class="ev tv">$${d.t2.toFixed(2)}</div><div class="es">Trail stop</div></div>
-      <div class="ee"><h4>R:R</h4><div class="ev ${rc(d.rr)}">${d.rr.toFixed(2)}:1</div><div class="es">Min 2:1</div></div>
+      <div class="ee"><h4>R:R</h4><div class="ev"><span class="signal-badge ${rc(d.rr)}">${d.rr.toFixed(2)}:1</span></div><div class="es">Min 2:1</div></div>
       <div class="ee"><h4>Size</h4><div class="ev">${d.position_size}</div><div class="es">of portfolio</div></div>
     </div>
     <div class="alert-box"><strong>When to act:</strong> ${d.alert}</div>
@@ -844,7 +848,7 @@ function renderDesktop(data) {
       <td class="mc">${pg}</td>
       <td class="vc">${vi(d.vol_label)}</td>
       <td class="mc">${d.composite.toFixed(1)}</td>
-      <td class="mc ${rc(d.rr)}">${d.rr.toFixed(1)}:1</td>
+      <td class="mc"><span class="signal-badge ${rc(d.rr)}">${d.rr.toFixed(1)}:1</span></td>
     </tr>
     <tr class="detail-row" id="dd${i}" style="display:${openRow===i?'table-row':'none'}">
       <td colspan="11">${detail(d)}</td>
@@ -884,7 +888,7 @@ function renderMobile(data) {
         <div class="cl"><h5>Stop Loss</h5><div class="clv red">$${d.stop.toFixed(2)}</div><div class="cls">Exit if broken</div></div>
         <div class="cl"><h5>Target 1</h5><div class="clv green">$${d.t1.toFixed(2)}</div><div class="cls">Scale 50%</div></div>
         <div class="cl"><h5>Target 2</h5><div class="clv green">$${d.t2.toFixed(2)}</div><div class="cls">Trail stop</div></div>
-        <div class="cl"><h5>R:R &nbsp; Size</h5><div class="clv ${rc(d.rr)}">${d.rr.toFixed(1)}:1</div><div class="cls">${d.position_size}</div></div>
+        <div class="cl"><h5>R:R &nbsp; Size</h5><div class="clv"><span class="signal-badge ${rc(d.rr)}">${d.rr.toFixed(1)}:1</span></div><div class="cls">${d.position_size}</div></div>
       </div>
       <div class="card-alert"><strong>When to act:</strong> ${d.alert}</div>
       <div class="card-expand">
