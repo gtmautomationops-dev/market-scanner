@@ -168,6 +168,20 @@ def test_cluster_buy_is_strong_bullish():
     assert any("cluster buy" in r for r in reasons)
 
 
+def test_10b5_1_cluster_sells_stay_neutral():
+    """Multiple insiders selling under 10b5-1 plans is routine, not a
+    cluster-sell CAUTION — planned trades carry no conviction signal."""
+    conn = make_db()
+    base = parse_form4_xml(load_fixture("form4_10b5_1_sale.xml"))
+    for i in range(4):
+        p = dict(base)
+        p["insider_cik"] = f"000000800{i}"
+        p["insider_name"] = f"SELLER {i}"
+        store_filing(conn, p, f"acc-s{i}", "2026-07-15", "u")
+    signal, reasons = classify_filing(conn, CFG, "acc-s0")
+    assert signal == "NEUTRAL", reasons
+
+
 def test_exercise_and_sale_below_threshold_is_neutral():
     conn = make_db()
     parsed = parse_form4_xml(load_fixture("form4_derivative_exercise.xml"))

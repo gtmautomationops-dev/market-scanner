@@ -372,6 +372,12 @@ def classify_filing(conn, cfg, accession):
     reasons = []
     ceo_cfo = bool(is_officer) and is_ceo_cfo(officer_title)
 
+    # Rule 10b5-1 planned trades are pre-scheduled and carry no information
+    # about current insider conviction — always NEUTRAL, regardless of size
+    # or clustering.
+    if is_10b5_1:
+        return "NEUTRAL", ["10b5-1 planned trade"]
+
     # Stake change fraction
     stake_change = None
     if pre_buy_owned and pre_buy_owned > 0 and post_owned is not None:
@@ -394,6 +400,7 @@ def classify_filing(conn, cfg, accession):
         """SELECT COUNT(DISTINCT f.insider_cik)
            FROM filings f JOIN transactions t ON f.accession_number = t.accession_number
            WHERE f.issuer_cik=? AND t.transaction_code='P'
+             AND f.is_10b5_1=0
              AND f.filed_at BETWEEN ? AND ?""",
         (issuer_cik, window_start, filed_at),
     )
@@ -402,6 +409,7 @@ def classify_filing(conn, cfg, accession):
         """SELECT COUNT(DISTINCT f.insider_cik)
            FROM filings f JOIN transactions t ON f.accession_number = t.accession_number
            WHERE f.issuer_cik=? AND t.transaction_code='S'
+             AND f.is_10b5_1=0
              AND f.filed_at BETWEEN ? AND ?""",
         (issuer_cik, window_start, filed_at),
     )
@@ -431,9 +439,7 @@ def classify_filing(conn, cfg, accession):
         return "BULLISH", reasons
 
     # --- NEUTRAL
-    if is_10b5_1:
-        reasons.append("10b5-1 planned trade")
-    elif sell_value > 0:
+    if sell_value > 0:
         reasons.append(f"sell ${sell_value:,.0f} below caution threshold")
     elif buy_value > 0:
         reasons.append(f"small buy ${buy_value:,.0f}")
@@ -485,6 +491,12 @@ def run_scrape():
                     continue
                 parsed = parse_form4_xml(xml_text)
                 if parsed is None:
+                    continue
+                # EDGAR lists a Form 4 under a company's submissions both
+                # when it is the issuer and when it is the reporting owner
+                # (e.g. holding a 10% stake in another company). Only keep
+                # filings where the watchlist company is the issuer.
+                if parsed["issuer_cik"] != cik:
                     continue
                 store_filing(conn, parsed, accession, filed_at, raw_url)
                 new_filings += 1
