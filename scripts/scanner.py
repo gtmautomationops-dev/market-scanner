@@ -16,72 +16,142 @@ import yfinance as yf
 # ─── TICKER LISTS ─────────────────────────────────────────────────────────────
 
 US_STOCKS = [
+    # Mega-cap tech
     "AAPL", "MSFT", "NVDA", "AMD", "INTC", "QCOM", "AVGO", "MU", "AMAT",
-    "LRCX", "KLAC", "ASML", "ARM", "SMCI", "PLTR", "SNOW", "CRM", "NOW", "ORCL",
+    "LRCX", "KLAC", "ASML", "ARM", "SMCI", "MRVL", "SNDK", "ADBE", "DELL",
+    "PLTR", "SNOW", "CRM", "NOW", "ORCL",
     "META", "GOOGL", "AMZN", "NFLX", "UBER", "ABNB", "SHOP", "SQ", "PYPL",
-    "COIN", "MSTR", "HOOD", "RBLX", "TTD", "ZS", "CRWD", "PANW", "OKTA",
-    "NET", "DDOG", "MDB", "CFLT", "GTLB",
+    "TSLA", "BABA", "JD",
+    # Fintech and crypto-adjacent
+    "COIN", "MSTR", "HOOD", "RBLX", "BMNR",
+    # Software and cloud
+    "TTD", "ZS", "CRWD", "PANW", "OKTA", "NET", "BOX",
+    "DDOG", "MDB", "CFLT", "GTLB",
+    # Energy
     "XOM", "CVX", "COP", "EOG", "DVN", "HAL", "SLB", "BKR", "MPC",
     "PSX", "VLO", "OXY", "APA", "FANG", "CTRA", "EQT", "AR", "RRC",
+    # Financials
     "JPM", "BAC", "WFC", "GS", "MS", "C", "USB", "PNC", "TFC", "COF",
     "AXP", "V", "MA", "BRK-B", "BLK", "SCHW", "ICE", "CME", "SPGI", "MCO",
+    "BX", "KKR",
+    # Healthcare
     "JNJ", "PFE", "ABBV", "MRK", "LLY", "BMY", "AMGN", "GILD", "REGN", "VRTX",
-    "ISRG", "MDT", "EW", "BDX", "DHR", "TMO", "IQV",
+    "ISRG", "MDT", "EW", "BDX", "DHR", "TMO", "IQV", "UNH", "HIMS",
+    # Industrials and defence
     "GEV", "GE", "RTX", "LMT", "NOC", "BA", "HON", "CAT", "DE", "EMR",
-    "ETN", "PH", "ROK", "AME", "FTV", "XYL", "TT",
+    "ETN", "PH", "ROK", "AME", "FTV", "XYL", "TT", "UPS",
+    # Consumer
     "WMT", "TGT", "COST", "HD", "LOW", "TJX", "ROST", "NKE", "LULU",
-    "MCD", "SBUX", "YUM", "CMG", "DPZ", "DRI",
-    "AMT", "PLD", "CCI", "EQIX", "PSA", "EXR", "AVB", "EQR",
+    "MCD", "SBUX", "YUM", "CMG", "DPZ", "DRI", "W", "NCLH",
+    # Real estate
+    "AMT", "PLD", "CCI", "EQIX", "PSA", "EXR", "AVB", "EQR", "DLR",
+    # Materials
     "NEM", "FCX", "GOLD", "AA", "NUE", "RS",
+    # Utilities
     "NEE", "SO", "DUK", "AEP", "D", "EXC", "XEL", "WEC", "AWK",
-    # AI / next-gen tech
+    # Alternatives and asset managers
+    "BN",
+    # Latin America and emerging market equities
+    "MELI", "NU",
+    # AI and next-gen tech
     "AI", "IONQ", "RGTI", "QBTS", "BBAI", "SOUN", "IREN", "CORZ", "APLD",
     "NBIS", "LITE", "AAOI", "SIVEF", "AXTI", "AEHR", "FLNC", "ABB",
-    "SOFI", "RDDT", "OPEN",
+    "SOFI", "RDDT", "OPEN", "QS", "SRFM",
     # AI power infrastructure
-    "VRT", "VST", "CEG", "TLN", "DLR", "IRM", "WMB", "ET",
+    "VRT", "VST", "CEG", "TLN", "IRM", "WMB", "ET",
+    # Small caps and speculative
+    "UAMY",
+    # Flagged for verification: resolved OK in yfinance on 2026-07-21
+    "SPCX", "SHAZ", "SKHY",
+    # Skipped intentionally:
+    # SIVEH: 404 in yfinance (quote not found) — likely typo for SIVEF, already present
+    # GOOG: duplicate of GOOGL (Class A already present)
+    # ABBNY: duplicate of ABB (NYSE: ABB already present)
+    # CCXI: acquired by Amgen 2022, delisted
+    # BTC/USD, CAD/JPY, USD/CAD, CL, VIX, RUTNU: FX, futures, indices, not equities
 ]
 
 US_ETFS = [
+    # Broad market
     "SPY", "QQQ", "IWM", "DIA", "VTI", "VOO", "VEA", "VWO",
+    # Bonds
     "AGG", "BND", "TLT", "IEF", "SHY", "HYG", "JNK", "LQD", "EMB",
+    "HYS", "SPHY",
+    # Sectors
     "XLK", "XLE", "XLF", "XLV", "XLI", "XLY", "XLP", "XLU", "XLB", "XLRE",
-    "SMH", "SOXX", "ARKK", "ARKG", "ARKF",
+    "SMH", "SOXX", "VGT", "SPYI",
+    # ARK funds removed: daily-reset factor decay, poor long-run tracking
+    # Dividend
     "SCHD", "VYM", "DVY", "HDV", "NOBL", "VIG", "SDY", "DGRO",
+    # Commodities
     "GLD", "SLV", "USO", "UNG", "PDBC",
-    "EFA", "EEM", "FXI", "EWJ", "EWZ", "KWEB",
-    "TQQQ", "SOXL", "UPRO",
-    "AIPO", "DRAM",
+    # International
+    "EFA", "EEM", "FXI", "EWJ", "EWZ", "EWY", "TUR", "KWEB",
+    # Crypto
+    "FBTC", "BITO",
+    # Thematic
+    "AIPO", "DRAM", "RAM",
+    # Leveraged products. Daily-reset decay erodes returns over multi-day holds.
+    # Entry and exit signal math is less meaningful for these instruments.
+    "TQQQ", "SOXL", "UPRO", "EDC", "FAS", "EURL", "DUSL", "BRZU", "INDL", "MUU", "KORU",
 ]
 
 CA_STOCKS = [
+    # Banks
     "RY.TO", "TD.TO", "BNS.TO", "BMO.TO", "CM.TO", "NA.TO", "EQB.TO",
+    # Energy
     "CNQ.TO", "SU.TO", "CVE.TO", "ATH.TO", "MEG.TO", "BTE.TO", "ARX.TO",
     "TOU.TO", "WCP.TO", "BIR.TO", "ERF.TO", "CPG.TO",
+    "ENB.TO", "PEY.TO", "NVA.TO", "TVE.TO", "SCR.TO", "SDE.TO",
+    # Metals and mining
     "ABX.TO", "AEM.TO", "WPM.TO", "KL.TO", "FNV.TO", "IMG.TO", "MAG.TO",
-    "SHOP.TO", "CSU.TO", "TOI.TO", "LSPD.TO", "DCBO.TO",
+    # Tech
+    "SHOP.TO", "CSU.TO", "TOI.TO", "LSPD.TO", "DCBO.TO", "MX.TO",
+    # Industrials and infrastructure
     "CNR.TO", "CP.TO", "WSP.TO", "STN.TO", "BYD.TO", "TIH.TO",
+    # Telecom and utilities
     "BCE.TO", "T.TO", "RCI-B.TO", "FTS.TO", "H.TO", "BEP-UN.TO",
+    # Consumer
     "ATD.TO", "L.TO", "MRU.TO", "DOL.TO", "CTC-A.TO", "EMP-A.TO",
+    # REITs
     "CAR-UN.TO", "REI-UN.TO", "AP-UN.TO", "HR-UN.TO",
+    # Insurance and financials
     "MFC.TO", "SLF.TO", "GWO.TO", "FFH.TO", "POW.TO",
+    # NEO and TSX-V listings (flagged for verification: yfinance support varies)
+    # TSX-only Canadian names file insider data with SEDI, not EDGAR.
+    "CAGE.NE", "NNRG.NE",
+    # Flagged: verify suffix before relying on data
+    "BTCY.NE", "MGM.V",
 ]
 
 CA_ETFS = [
+    # Broad market
     "XIU.TO", "XIC.TO", "ZCN.TO", "VCN.TO", "HXT.TO",
+    # Dividend
     "XDV.TO", "CDZ.TO", "VDY.TO", "ZWB.TO",
-    "XEG.TO", "XFN.TO", "XGD.TO", "ZEB.TO",
-    "XSP.TO", "ZSP.TO", "VSP.TO", "XQQ.TO", "ZQQ.TO",
+    # Sector
+    "XEG.TO", "XFN.TO", "XGD.TO", "ZEB.TO", "TEC.TO",
+    # US exposure (CAD-hedged)
+    "XSP.TO", "ZSP.TO", "VSP.TO", "XQQ.TO", "ZQQ.TO", "VFV.TO",
+    # Bonds
     "XBB.TO", "ZAG.TO", "VAB.TO", "XSB.TO",
+    # International
     "XEF.TO", "ZEA.TO", "VEE.TO",
+    # Asset allocation
     "XGRO.TO", "XBAL.TO", "VGRO.TO", "VBAL.TO", "VCNS.TO",
     "XEQT.TO", "VEQT.TO", "ZEQT.TO",
+    # Thematic (verify yfinance support)
+    "TCSH.TO",
+    # Leveraged products. Daily-reset decay erodes returns over multi-day holds.
+    # Entry and exit signal math is less meaningful for these instruments.
+    "HOU.TO",
 ]
 
 ETF_SET = set(US_ETFS + CA_ETFS + ["DRAM"])
 
 BOND_ETF_SET = {
     "AGG", "BND", "TLT", "IEF", "SHY", "HYG", "JNK", "LQD", "EMB",
+    "HYS", "SPHY",
     "XBB.TO", "ZAG.TO", "VAB.TO", "XSB.TO",
 }
 
@@ -1244,6 +1314,7 @@ def run_scan():
 
     print(f"Scanning {len(tickers)} tickers with Technical + Volume + Lynch scoring...")
     results = []
+    failed = []
     BATCH = 50
 
     for i in range(0, len(tickers), BATCH):
@@ -1260,6 +1331,7 @@ def run_scan():
             )
         except Exception as e:
             print(f"  Download error: {e}")
+            failed.extend((t, f"batch download error: {e}") for t in batch)
             continue
 
         for ticker in batch:
@@ -1267,6 +1339,7 @@ def run_scan():
                 hist = (data[ticker] if len(batch) > 1 and ticker in data.columns.get_level_values(0)
                         else (data if len(batch) == 1 else None))
                 if hist is None or hist.empty:
+                    failed.append((ticker, "no price data returned"))
                     continue
                 info = {}
                 try:
@@ -1277,8 +1350,21 @@ def run_scan():
                 r = score_ticker(ticker, info, hist)
                 if r:
                     results.append(r)
+                else:
+                    failed.append((ticker, "scoring returned no result"))
             except Exception as e:
                 print(f"  Error {ticker}: {e}")
+                failed.append((ticker, str(e)))
+
+    print()
+    print(f"=== Scan summary ===")
+    print(f"  Requested: {len(tickers)}")
+    print(f"  Scored:    {len(results)}")
+    print(f"  Failed:    {len(failed)}")
+    if failed:
+        print("  Failed tickers (did not resolve in yfinance):")
+        for t, reason in failed:
+            print(f"    {t}: {reason}")
 
     print(f"Scored {len(results)} tickers. Writing dashboard...")
     signal_order = {"Strong Buy": 0, "Buy": 1, "Hold": 2, "Caution": 3}

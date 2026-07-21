@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "scanner",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["scripts/scanner.py"],
+      "port": 0
+    },
+    {
+      "name": "dashboard-preview",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8080", "--directory", "docs"],
+      "port": 8080
+    }
+  ]
+}
