@@ -38,7 +38,7 @@ watchlist:
   - UBER
   - ABNB
   - SHOP
-  - SQ
+  - XYZ  # Block, Inc. (formerly SQ; ticker changed 2025)
   - PYPL
   - TSLA
   - BABA
@@ -248,11 +248,28 @@ signals:
   stake_reduction_caution: 0.50
 
 scraper:
+  # Coverage mode:
+  #   watchlist - only the tickers listed above (fast, focused, no discovery)
+  #   firehose  - EVERY Form 4 filed market-wide, read from EDGAR daily
+  #               indexes (Kestrel-style; surfaces insider activity in names
+  #               you are not already watching). Ignores the watchlist.
+  mode: firehose
   # SEC fair-access policy: max 10 requests/second, identified User-Agent
   max_requests_per_second: 10
   user_agent: "MarketScanner InsiderRadar devrim.birlik@revunited.ca"
-  # Days to backfill on first run (empty database)
+  # Days to backfill on first run in watchlist mode
   backfill_days: 30
+  # Days to backfill on first run in firehose mode. Kept small because a
+  # single market-wide day is thousands of filings; history accumulates as
+  # scheduled runs append each new trading day.
+  firehose_backfill_days: 3
+  # In firehose mode, only store filings that contain an open-market
+  # purchase (P) or sale (S). Drops routine awards/exercises/gifts/tax
+  # withholding, which carry no directional signal and would bloat the DB.
+  firehose_signal_only: true
   # Retry with exponential backoff on 429/503
   max_retries: 5
   backoff_base_seconds: 2
+  # Firehose accumulates market-wide filings every run; prune anything older
+  # than this many days so the committed SQLite database stays bounded.
+  retention_days: 120

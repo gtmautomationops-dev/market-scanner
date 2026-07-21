@@ -49,7 +49,7 @@ class SecClient:
         self.max_retries = s["max_retries"]
         self.backoff_base = s["backoff_base_seconds"]
 
-    def get(self, url, **kwargs):
+    def get(self, url, allow_missing=False, **kwargs):
         for attempt in range(self.max_retries):
             self.limiter.wait()
             resp = self.session.get(url, timeout=30, **kwargs)
@@ -58,6 +58,11 @@ class SecClient:
                 print(f"  HTTP {resp.status_code} on {url}, backing off {wait}s")
                 time.sleep(wait)
                 continue
+            # Daily-index files for weekends/holidays/not-yet-published dates
+            # come back as 404 or 403 depending on the endpoint; treat both as
+            # "no file for this day" when the caller opts in.
+            if allow_missing and resp.status_code in (403, 404):
+                return None
             resp.raise_for_status()
             return resp
         raise RuntimeError(f"Gave up after {self.max_retries} retries: {url}")
@@ -319,6 +324,168 @@ def store_filing(conn, parsed, accession, filed_at, raw_url):
     conn.commit()
 
 
+def prune_old_filings(conn, retention_days):
+    """Delete filings (and their transactions) older than the retention
+    window so the committed database stays bounded across runs."""
+    if not retention_days:
+        return 0
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=retention_days)).strftime("%Y-%m-%d")
+    cur = conn.cursor()
+    cur.execute(
+        "DELETE FROM transactions WHERE accession_number IN "
+        "(SELECT accession_number FROM filings WHERE filed_at < ?)",
+        (cutoff,),
+    )
+    cur.execute("DELETE FROM filings WHERE filed_at < ?", (cutoff,))
+    removed = cur.rowcount
+    conn.commit()
+    return removed
+
+
+# ---------------------------------------------------------------- firehose
+
+def _quarter(d):
+    return (d.month - 1) // 3 + 1
+
+
+def fetch_daily_form4_index(client, date):
+    """Read one day's EDGAR master index and return every Form 4 / 4A filing
+    as (issuer_cik, form_type, filing_path). Returns [] on weekends/holidays
+    (no index file published)."""
+    url = (
+        f"https://www.sec.gov/Archives/edgar/daily-index/"
+        f"{date.year}/QTR{_quarter(date)}/master.{date.strftime('%Y%m%d')}.idx"
+    )
+    resp = client.get(url, allow_missing=True)
+    if resp is None:
+        return []
+    out = []
+    for line in resp.text.splitlines():
+        parts = line.split("|")
+        if len(parts) != 5:
+            continue
+        cik, _name, form, filed, path = parts
+        if form.strip() in ("4", "4/A"):
+            # filed is YYYYMMDD; normalize to YYYY-MM-DD
+            f = filed.strip()
+            filed_iso = f"{f[0:4]}-{f[4:6]}-{f[6:8]}" if len(f) == 8 else f
+            out.append((cik.strip().zfill(10), form.strip(), filed_iso, path.strip()))
+    return out
+
+
+def _accession_from_path(path):
+    # e.g. edgar/data/320193/0000320193-26-000101.txt
+    return path.rsplit("/", 1)[-1].replace(".txt", "")
+
+
+def fetch_submission_xml(client, path):
+    """Fetch a full submission .txt and extract its ownershipDocument XML."""
+    url = f"https://www.sec.gov/Archives/{path}"
+    resp = client.get(url)
+    m = re.search(r"<ownershipDocument>.*?</ownershipDocument>", resp.text, re.DOTALL)
+    if not m:
+        return None, url
+    return '<?xml version="1.0"?>' + m.group(0), url
+
+
+def _has_open_market_txn(parsed):
+    return any(
+        t["transaction_code"] in ("P", "S") and not t["is_derivative"]
+        for t in parsed["transactions"]
+    )
+
+
+def run_firehose_scrape():
+    """Market-wide scrape: ingest every Form 4 filed on EDGAR, not just the
+    watchlist. This is what makes coverage comparable to a full insider
+    tracker rather than a curated list."""
+    cfg = load_config()
+    scfg = cfg["scraper"]
+    client = SecClient(cfg)
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("SELECT COUNT(*) FROM filings")
+    first_run = cur.fetchone()[0] == 0
+    backfill = scfg.get("firehose_backfill_days", 3) if first_run else 2
+    signal_only = scfg.get("firehose_signal_only", True)
+
+    today = datetime.now(timezone.utc).date()
+    dates = [today - timedelta(days=i) for i in range(backfill + 1)]
+    print(f"Firehose {'backfill' if first_run else 'incremental'}: "
+          f"{dates[-1]} .. {today} ({len(dates)} days)")
+
+    # Collect all Form 4 filings across the window
+    index_rows = []
+    for d in sorted(dates):
+        rows = fetch_daily_form4_index(client, d)
+        if rows:
+            print(f"  {d}: {len(rows)} Form 4 filings in index")
+        index_rows.extend(rows)
+
+    stored = skipped_dupe = skipped_neutral = 0
+    errors = []
+    for issuer_cik, form_type, filed_at, path in index_rows:
+        accession = _accession_from_path(path)
+        cur.execute("SELECT 1 FROM filings WHERE accession_number=?", (accession,))
+        if cur.fetchone() and form_type != "4/A":
+            skipped_dupe += 1
+            continue
+        try:
+            xml_text, raw_url = fetch_submission_xml(client, path)
+            if xml_text is None:
+                errors.append(f"{accession}: no ownershipDocument")
+                continue
+            parsed = parse_form4_xml(xml_text)
+            if parsed is None:
+                continue
+            if signal_only and not _has_open_market_txn(parsed):
+                skipped_neutral += 1
+                continue
+            # filed_at is the true EDGAR filing date from the daily index;
+            # per-transaction dates are stored separately on each transaction.
+            store_filing(conn, parsed, accession, filed_at, raw_url)
+            stored += 1
+        except Exception as e:
+            errors.append(f"{accession}: {e}")
+
+    pruned = prune_old_filings(conn, scfg.get("retention_days"))
+
+    since = dates[-1].strftime("%Y-%m-%d")
+    cur.execute("SELECT accession_number FROM filings WHERE filed_at >= ?", (since,))
+    classified = []
+    for (accession,) in cur.fetchall():
+        signal, reasons = classify_filing(conn, cfg, accession)
+        classified.append({"accession": accession, "signal": signal, "reasons": reasons})
+
+    runlog = {
+        "run_at": datetime.now(timezone.utc).isoformat(),
+        "mode": "firehose",
+        "first_run": first_run,
+        "since": since,
+        "form4_in_window": len(index_rows),
+        "stored": stored,
+        "skipped_duplicate": skipped_dupe,
+        "skipped_no_open_market_txn": skipped_neutral,
+        "pruned_old": pruned,
+        "classified": classified,
+        "errors": errors,
+    }
+    RUNLOG_PATH.parent.mkdir(exist_ok=True)
+    RUNLOG_PATH.write_text(json.dumps(runlog, indent=2), encoding="utf-8")
+
+    print(f"\n=== Insider Radar FIREHOSE summary ===")
+    print(f"  Form 4 filings in window: {len(index_rows)}")
+    print(f"  Stored:                   {stored}")
+    print(f"  Skipped (duplicate):      {skipped_dupe}")
+    print(f"  Skipped (no P/S txn):     {skipped_neutral}")
+    print(f"  Errors:                   {len(errors)}")
+    for e in errors[:20]:
+        print(f"    {e}")
+    print(f"  Runlog written to {RUNLOG_PATH}")
+    return conn
+
+
 # ---------------------------------------------------------------- signals
 
 def is_ceo_cfo(officer_title):
@@ -440,7 +607,12 @@ def classify_filing(conn, cfg, accession):
 
     # --- NEUTRAL
     if sell_value > 0:
-        reasons.append(f"sell ${sell_value:,.0f} below caution threshold")
+        if sell_value > sig_cfg["routine_sell_usd"]:
+            # Large sell that isn't a CAUTION trigger — only CEO/CFO
+            # non-10b5-1 sells and cluster sells escalate, per spec.
+            reasons.append(f"sell ${sell_value:,.0f} (non-CEO/CFO, not a caution trigger)")
+        else:
+            reasons.append(f"sell ${sell_value:,.0f} below caution threshold")
     elif buy_value > 0:
         reasons.append(f"small buy ${buy_value:,.0f}")
     else:
@@ -504,6 +676,8 @@ def run_scrape():
                 errors.append((ticker, f"{accession}: {e}"))
         print(f"  {ticker}: {len(filings)} filings in window")
 
+    prune_old_filings(conn, cfg["scraper"].get("retention_days"))
+
     # Classify everything in the recent window
     cur.execute(
         "SELECT accession_number FROM filings WHERE filed_at >= ?", (since,)
@@ -515,6 +689,7 @@ def run_scrape():
 
     runlog = {
         "run_at": datetime.now(timezone.utc).isoformat(),
+        "mode": "watchlist",
         "first_run": first_run,
         "since": since,
         "watchlist_size": len(watchlist),
@@ -536,11 +711,23 @@ def run_scrape():
     return conn
 
 
+def scrape_by_mode():
+    """Dispatch to the scraper for the configured mode, with CLI overrides."""
+    cfg = load_config()
+    mode = cfg["scraper"].get("mode", "watchlist")
+    if "--firehose" in sys.argv:
+        mode = "firehose"
+    elif "--watchlist" in sys.argv:
+        mode = "watchlist"
+    print(f"Insider Radar mode: {mode}")
+    return run_firehose_scrape() if mode == "firehose" else run_scrape()
+
+
 if __name__ == "__main__":
     if "--dashboard-only" in sys.argv:
         from insider_dashboard import build_dashboard_and_email
         build_dashboard_and_email(get_db(), load_config())
     else:
-        conn = run_scrape()
+        conn = scrape_by_mode()
         from insider_dashboard import build_dashboard_and_email
         build_dashboard_and_email(conn, load_config())
