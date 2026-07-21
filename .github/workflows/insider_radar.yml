@@ -1,0 +1,100 @@
+name: Insider Radar
+
+on:
+  schedule:
+    # Scrape: 6am, 10am, 1pm, 4pm Pacific (PDT = UTC-7)
+    - cron: '0 13 * * 1-5'
+    - cron: '0 17 * * 1-5'
+    - cron: '0 20 * * 1-5'
+    - cron: '0 23 * * 1-5'
+    # Email: 6:15am Pacific
+    - cron: '15 13 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      job:
+        description: "Which job to run"
+        type: choice
+        options: [scrape, email, both]
+        default: both
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  scrape:
+    # Runs on the four scrape crons and on manual dispatch (scrape/both).
+    # Kept separate from email so a scrape failure never kills the email.
+    if: >-
+      (github.event_name == 'schedule' && github.event.schedule != '15 13 * * 1-5') ||
+      (github.event_name == 'workflow_dispatch' && inputs.job != 'email')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run insider radar scrape
+        run: python scripts/insider_radar.py
+
+      - name: Commit database and dashboard
+        run: |
+          git config user.name "insider-radar-bot"
+          git config user.email "actions@github.com"
+          git add data/insider_radar.db data/insider_radar_runlog.json docs/insider_radar.html docs/insider_email.html docs/insider_email_subject.txt
+          git diff --cached --quiet || git commit -m "Insider Radar scrape $(date -u +%Y-%m-%dT%H:%M)"
+          git pull --rebase origin main
+          git push origin main
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          publish_branch: gh-pages
+
+  email:
+    # Runs on the 6:15am Pacific cron and on manual dispatch (email/both).
+    # Reads the latest committed email HTML from the most recent scrape;
+    # does not depend on the scrape job succeeding.
+    if: >-
+      (github.event_name == 'schedule' && github.event.schedule == '15 13 * * 1-5') ||
+      (github.event_name == 'workflow_dispatch' && inputs.job != 'scrape')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check email content exists
+        id: check
+        run: |
+          if [ -f docs/insider_email.html ] && [ -f docs/insider_email_subject.txt ]; then
+            echo "found=true" >> $GITHUB_OUTPUT
+            echo "subject=$(cat docs/insider_email_subject.txt)" >> $GITHUB_OUTPUT
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+            echo "No email content found — has a scrape run yet?"
+          fi
+
+      - name: Send Insider Radar email
+        if: steps.check.outputs.found == 'true'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USERNAME }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: ${{ steps.check.outputs.subject }}
+          to: gtmautomation.ops@gmail.com
+          from: Insider Radar <${{ secrets.GMAIL_USERNAME }}>
+          html_body: file://docs/insider_email.html

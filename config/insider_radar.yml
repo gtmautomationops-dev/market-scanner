@@ -1,0 +1,258 @@
+# Insider Radar configuration
+#
+# Watchlist seeded from US_STOCKS in scripts/scanner.py (post Workstream B update).
+# TSX / TSX-V / NEO tickers are excluded: Canadian insiders file with SEDI, not
+# SEC EDGAR, so Form 4 coverage does not exist for them.
+# Note: foreign private issuers (e.g. BABA, JD, ABB, ASML) are exempt from
+# Section 16 and rarely file Form 4 — they stay on the list but will be quiet.
+
+watchlist:
+  # Mega-cap tech
+  - AAPL
+  - MSFT
+  - NVDA
+  - AMD
+  - INTC
+  - QCOM
+  - AVGO
+  - MU
+  - AMAT
+  - LRCX
+  - KLAC
+  - ASML
+  - ARM
+  - SMCI
+  - MRVL
+  - SNDK
+  - ADBE
+  - DELL
+  - PLTR
+  - SNOW
+  - CRM
+  - NOW
+  - ORCL
+  - META
+  - GOOGL
+  - AMZN
+  - NFLX
+  - UBER
+  - ABNB
+  - SHOP
+  - SQ
+  - PYPL
+  - TSLA
+  - BABA
+  - JD
+  # Fintech and crypto-adjacent
+  - COIN
+  - MSTR
+  - HOOD
+  - RBLX
+  - BMNR
+  # Software and cloud
+  - TTD
+  - ZS
+  - CRWD
+  - PANW
+  - OKTA
+  - NET
+  - BOX
+  - DDOG
+  - MDB
+  - CFLT
+  - GTLB
+  # Energy
+  - XOM
+  - CVX
+  - COP
+  - EOG
+  - DVN
+  - HAL
+  - SLB
+  - BKR
+  - MPC
+  - PSX
+  - VLO
+  - OXY
+  - APA
+  - FANG
+  - CTRA
+  - EQT
+  - AR
+  - RRC
+  # Financials
+  - JPM
+  - BAC
+  - WFC
+  - GS
+  - MS
+  - C
+  - USB
+  - PNC
+  - TFC
+  - COF
+  - AXP
+  - V
+  - MA
+  - BRK-B
+  - BLK
+  - SCHW
+  - ICE
+  - CME
+  - SPGI
+  - MCO
+  - BX
+  - KKR
+  # Healthcare
+  - JNJ
+  - PFE
+  - ABBV
+  - MRK
+  - LLY
+  - BMY
+  - AMGN
+  - GILD
+  - REGN
+  - VRTX
+  - ISRG
+  - MDT
+  - EW
+  - BDX
+  - DHR
+  - TMO
+  - IQV
+  - UNH
+  - HIMS
+  # Industrials and defence
+  - GEV
+  - GE
+  - RTX
+  - LMT
+  - NOC
+  - BA
+  - HON
+  - CAT
+  - DE
+  - EMR
+  - ETN
+  - PH
+  - ROK
+  - AME
+  - FTV
+  - XYL
+  - TT
+  - UPS
+  # Consumer
+  - WMT
+  - TGT
+  - COST
+  - HD
+  - LOW
+  - TJX
+  - ROST
+  - NKE
+  - LULU
+  - MCD
+  - SBUX
+  - YUM
+  - CMG
+  - DPZ
+  - DRI
+  - W
+  - NCLH
+  # Real estate
+  - AMT
+  - PLD
+  - CCI
+  - EQIX
+  - PSA
+  - EXR
+  - AVB
+  - EQR
+  - DLR
+  # Materials
+  - NEM
+  - FCX
+  - GOLD
+  - AA
+  - NUE
+  - RS
+  # Utilities
+  - NEE
+  - SO
+  - DUK
+  - AEP
+  - D
+  - EXC
+  - XEL
+  - WEC
+  - AWK
+  # Alternatives and asset managers
+  - BN
+  # Latin America and emerging markets
+  - MELI
+  - NU
+  # AI and next-gen tech
+  - AI
+  - IONQ
+  - RGTI
+  - QBTS
+  - BBAI
+  - SOUN
+  - IREN
+  - CORZ
+  - APLD
+  - NBIS
+  - LITE
+  - AAOI
+  - SIVEF
+  - AXTI
+  - AEHR
+  - FLNC
+  - ABB
+  - SOFI
+  - RDDT
+  - OPEN
+  - QS
+  - SRFM
+  # AI power infrastructure
+  - VRT
+  - VST
+  - CEG
+  - TLN
+  - IRM
+  - WMB
+  - ET
+  # Small caps and speculative
+  - UAMY
+  - SPCX
+  - SHAZ
+  - SKHY
+
+signals:
+  # Rolling window (days) for cluster detection
+  cluster_window_days: 30
+  # Minimum distinct insiders buying (code P) within window for a cluster buy
+  cluster_min_insiders: 3
+  # Open-market purchase above this is a "notable buy" (USD)
+  notable_buy_usd: 250000
+  # CEO/CFO non-10b5-1 purchase above this is STRONG BULLISH (USD)
+  officer_strong_buy_usd: 500000
+  # CEO/CFO non-10b5-1 sell above this is CAUTION (USD)
+  officer_caution_sell_usd: 1000000
+  # Sells below this are NEUTRAL (USD)
+  routine_sell_usd: 1000000
+  # Stake increase above this fraction is BULLISH
+  stake_increase_bullish: 0.20
+  # Stake reduction above this fraction is CAUTION
+  stake_reduction_caution: 0.50
+
+scraper:
+  # SEC fair-access policy: max 10 requests/second, identified User-Agent
+  max_requests_per_second: 10
+  user_agent: "MarketScanner InsiderRadar devrim.birlik@revunited.ca"
+  # Days to backfill on first run (empty database)
+  backfill_days: 30
+  # Retry with exponential backoff on 429/503
+  max_retries: 5
+  backoff_base_seconds: 2

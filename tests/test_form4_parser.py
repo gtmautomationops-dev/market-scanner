@@ -1,0 +1,194 @@
+"""Tests for Form 4 parsing and signal classification.
+
+Fixtures are modeled on real EDGAR ownershipDocument XML structure
+(schema version X0407/X0508 as filed).
+"""
+
+import sqlite3
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+
+import insider_radar
+from insider_radar import parse_form4_xml, classify_filing, store_filing, SCHEMA
+
+FIXTURES = Path(__file__).parent / "fixtures"
+
+CFG = {
+    "signals": {
+        "cluster_window_days": 30,
+        "cluster_min_insiders": 3,
+        "notable_buy_usd": 250000,
+        "officer_strong_buy_usd": 500000,
+        "officer_caution_sell_usd": 1000000,
+        "routine_sell_usd": 1000000,
+        "stake_increase_bullish": 0.20,
+        "stake_reduction_caution": 0.50,
+    }
+}
+
+
+def load_fixture(name):
+    return (FIXTURES / name).read_text(encoding="utf-8")
+
+
+def make_db():
+    conn = sqlite3.connect(":memory:")
+    conn.executescript(SCHEMA)
+    return conn
+
+
+# ---------------------------------------------------------------- parsing
+
+def test_parse_ceo_open_market_purchase():
+    parsed = parse_form4_xml(load_fixture("form4_ceo_purchase.xml"))
+    assert parsed is not None
+    assert parsed["form_type"] == "4"
+    assert parsed["issuer_ticker"] == "ACME"
+    assert parsed["issuer_cik"] == "0000320193"
+    assert parsed["insider_name"] == "DOE JANE"
+    assert parsed["is_officer"] == 1
+    assert parsed["officer_title"] == "Chief Executive Officer"
+    assert parsed["is_10b5_1"] == 0
+    assert len(parsed["transactions"]) == 1
+    txn = parsed["transactions"][0]
+    assert txn["transaction_code"] == "P"
+    assert txn["shares"] == 50000
+    assert txn["price_per_share"] == 14.50
+    assert txn["acquired_disposed"] == "A"
+    assert txn["shares_owned_after"] == 250000
+    assert txn["is_derivative"] == 0
+
+
+def test_parse_10b5_1_sale():
+    parsed = parse_form4_xml(load_fixture("form4_10b5_1_sale.xml"))
+    assert parsed is not None
+    assert parsed["is_10b5_1"] == 1
+    txn = parsed["transactions"][0]
+    assert txn["transaction_code"] == "S"
+    assert txn["acquired_disposed"] == "D"
+
+
+def test_parse_derivative_table():
+    parsed = parse_form4_xml(load_fixture("form4_derivative_exercise.xml"))
+    assert parsed is not None
+    codes = {(t["transaction_code"], t["is_derivative"]) for t in parsed["transactions"]}
+    # Option exercise appears in the derivative table, resulting share
+    # acquisition and same-day sale in the non-derivative table
+    assert ("M", 1) in codes
+    assert ("M", 0) in codes
+    assert ("S", 0) in codes
+    deriv = [t for t in parsed["transactions"] if t["is_derivative"]][0]
+    assert deriv["security_title"] == "Stock Option (Right to Buy)"
+    assert deriv["shares"] == 20000
+
+
+def test_parse_director_small_buy():
+    parsed = parse_form4_xml(load_fixture("form4_director_buy.xml"))
+    assert parsed is not None
+    assert parsed["is_director"] == 1
+    assert parsed["is_officer"] == 0
+    assert parsed["transactions"][0]["transaction_code"] == "P"
+
+
+def test_parse_rejects_non_form4():
+    xml = "<?xml version=\"1.0\"?><ownershipDocument><documentType>3</documentType></ownershipDocument>"
+    assert parse_form4_xml(xml) is None
+
+
+# ---------------------------------------------------------------- storage
+
+def test_store_and_dedupe():
+    conn = make_db()
+    parsed = parse_form4_xml(load_fixture("form4_ceo_purchase.xml"))
+    store_filing(conn, parsed, "0000320193-26-000101", "2026-07-15", "http://example")
+    store_filing(conn, parsed, "0000320193-26-000101", "2026-07-15", "http://example")
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM filings")
+    assert cur.fetchone()[0] == 1
+    cur.execute("SELECT COUNT(*) FROM transactions")
+    assert cur.fetchone()[0] == 1
+
+
+def test_amendment_replaces_original():
+    conn = make_db()
+    original = parse_form4_xml(load_fixture("form4_ceo_purchase.xml"))
+    store_filing(conn, original, "0000320193-26-000101", "2026-07-15", "http://example")
+    amended = dict(original)
+    amended["form_type"] = "4/A"
+    store_filing(conn, amended, "0000320193-26-000150", "2026-07-16", "http://example")
+    cur = conn.cursor()
+    cur.execute("SELECT accession_number, form_type, amends_accession FROM filings")
+    rows = cur.fetchall()
+    assert len(rows) == 1
+    assert rows[0][0] == "0000320193-26-000150"
+    assert rows[0][1] == "4/A"
+    assert rows[0][2] == "0000320193-26-000101"
+
+
+# ---------------------------------------------------------------- signals
+
+def test_ceo_large_purchase_is_strong_bullish():
+    conn = make_db()
+    parsed = parse_form4_xml(load_fixture("form4_ceo_purchase.xml"))
+    store_filing(conn, parsed, "acc-1", "2026-07-15", "u")
+    signal, reasons = classify_filing(conn, CFG, "acc-1")
+    # 50,000 * $14.50 = $725,000 non-10b5-1 CEO buy > $500K threshold
+    assert signal == "STRONG BULLISH", reasons
+
+
+def test_10b5_1_sale_is_neutral():
+    conn = make_db()
+    parsed = parse_form4_xml(load_fixture("form4_10b5_1_sale.xml"))
+    store_filing(conn, parsed, "acc-2", "2026-07-15", "u")
+    signal, reasons = classify_filing(conn, CFG, "acc-2")
+    assert signal == "NEUTRAL", reasons
+
+
+def test_director_small_buy_is_neutral():
+    conn = make_db()
+    parsed = parse_form4_xml(load_fixture("form4_director_buy.xml"))
+    store_filing(conn, parsed, "acc-3", "2026-07-15", "u")
+    signal, reasons = classify_filing(conn, CFG, "acc-3")
+    # 1,000 * $42 = $42,000 — below the $250K notable-buy threshold
+    assert signal == "NEUTRAL", reasons
+
+
+def test_cluster_buy_is_strong_bullish():
+    conn = make_db()
+    base = parse_form4_xml(load_fixture("form4_director_buy.xml"))
+    for i in range(3):
+        p = dict(base)
+        p["insider_cik"] = f"000000900{i}"
+        p["insider_name"] = f"INSIDER {i}"
+        store_filing(conn, p, f"acc-c{i}", "2026-07-15", "u")
+    signal, reasons = classify_filing(conn, CFG, "acc-c0")
+    assert signal == "STRONG BULLISH", reasons
+    assert any("cluster buy" in r for r in reasons)
+
+
+def test_exercise_and_sale_below_threshold_is_neutral():
+    conn = make_db()
+    parsed = parse_form4_xml(load_fixture("form4_derivative_exercise.xml"))
+    store_filing(conn, parsed, "acc-4", "2026-07-15", "u")
+    signal, reasons = classify_filing(conn, CFG, "acc-4")
+    # Routine option exercise + sale under $1M by a non-CEO/CFO officer
+    assert signal == "NEUTRAL", reasons
+
+
+if __name__ == "__main__":
+    import traceback
+    passed = failed = 0
+    for name, fn in sorted(globals().items()):
+        if name.startswith("test_") and callable(fn):
+            try:
+                fn()
+                passed += 1
+                print(f"PASS {name}")
+            except Exception:
+                failed += 1
+                print(f"FAIL {name}")
+                traceback.print_exc()
+    print(f"\n{passed} passed, {failed} failed")
+    sys.exit(1 if failed else 0)
