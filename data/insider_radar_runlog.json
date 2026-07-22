@@ -1,11 +1,11 @@
 {
-  "run_at": "2026-07-22T15:07:57.920652+00:00",
+  "run_at": "2026-07-22T18:12:41.012699+00:00",
   "mode": "firehose",
   "first_run": false,
   "since": "2026-07-20",
   "form4_in_window": 1173,
-  "stored": 96,
-  "skipped_duplicate": 333,
+  "stored": 4,
+  "skipped_duplicate": 425,
   "skipped_no_open_market_txn": 744,
   "pruned_old": 0,
   "classified": [
@@ -745,13 +745,6 @@
       ]
     },
     {
-      "accession": "0001178913-26-003542",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "10b5-1 planned trade"
-      ]
-    },
-    {
       "accession": "0000100517-26-000142",
       "signal": "CAUTION",
       "reasons": [
@@ -1172,13 +1165,6 @@
       ]
     },
     {
-      "accession": "0001772603-26-000012",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "10b5-1 planned trade"
-      ]
-    },
-    {
       "accession": "0001777830-26-000014",
       "signal": "NEUTRAL",
       "reasons": [
@@ -1400,6 +1386,20 @@
       "signal": "CAUTION",
       "reasons": [
         "stake reduced 100%"
+      ]
+    },
+    {
+      "accession": "0001178913-26-003542",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001772603-26-000012",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
       ]
     }
   ],
