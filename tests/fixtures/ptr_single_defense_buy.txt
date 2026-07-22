@@ -1,0 +1,17 @@
+Filing ID #20099999
+P        T           R
+Clerk of the House of Representatives Legislative Resource Center B81 Cannon Building Washington, DC 20515
+F     I
+Name: Hon. Jane Q Example
+Status: Member
+State/District: TX22
+T
+ID Owner Asset Transaction Date Notification Amount Cap.
+Type Date Gains >
+$200?
+Lockheed Martin Corp - Common Stock P 05/12/2026 05/20/2026 $250,001 - $500,000
+(LMT) [ST]
+F      S     : New
+S          O :
+D          : Purchase of defense contractor common stock.
+* For the complete list of asset type abbreviations, please visit https://fd.house.gov/reference/asset-type-codes.aspx.

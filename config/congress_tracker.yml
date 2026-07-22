@@ -1,0 +1,87 @@
+# Congressional Trades Tracker configuration
+#
+# Data sources (all public):
+#   - House Periodic Transaction Reports (PTRs) filed under the STOCK Act,
+#     published by the Clerk of the House: https://disclosures-clerk.house.gov
+#   - Committee rosters from the unitedstates/congress-legislators project.
+#
+# What this tool does: surfaces members' disclosed stock trades and FLAGS
+# trades in a sector the member's committee has jurisdiction over. These are
+# lawfully disclosed trades; a committee-overlap flag indicates a potential
+# conflict of interest worth scrutiny, NOT proof of wrongdoing.
+
+scraper:
+  user_agent: "CongressTradesTracker research devrim.birlik@revunited.ca"
+  max_requests_per_second: 8
+  # Filing year(s) to pull from the House Clerk annual index.
+  years: [2026]
+  # On first run, backfill this many days of PTRs; later runs pull recent only.
+  backfill_days: 45
+  incremental_days: 10
+  max_retries: 5
+  backoff_base_seconds: 2
+  # Refresh cached committee/legislator YAML if older than this many hours.
+  roster_cache_hours: 24
+
+signals:
+  # A disclosed trade whose upper amount band is at least this is "LARGE".
+  large_usd: 100000
+  # Cluster: this many distinct members trading the same ticker within window.
+  cluster_min_members: 3
+  cluster_window_days: 30
+
+# Committees whose members get a standing "critical committee" badge. Matched
+# as case-insensitive substrings against the official committee name.
+critical_committees:
+  - Armed Services
+  - Intelligence
+  - Financial Services
+  - Banking, Housing
+  - Energy and Commerce
+  - Energy and Natural Resources
+  - Appropriations
+  - Ways and Means
+  - Finance
+  - Foreign Affairs
+  - Foreign Relations
+  - Homeland Security
+  - Commerce, Science
+
+# Committee jurisdiction -> market sectors. Keyed by the 4-character base
+# committee code (subcommittee codes share the first 4 chars). H* = House,
+# S* = Senate.
+committee_sectors:
+  HSAS: [defense, aerospace]        # House Armed Services
+  SSAS: [defense, aerospace]        # Senate Armed Services
+  HLIG: [defense, technology]       # House Intelligence
+  SLIN: [defense, technology]       # Senate Intelligence
+  HSBA: [financials]                # House Financial Services
+  SSBK: [financials]                # Senate Banking, Housing
+  HSIF: [energy, healthcare, technology]  # House Energy & Commerce
+  SSEG: [energy]                    # Senate Energy & Natural Resources
+  SSCM: [technology, transportation]      # Senate Commerce, Science
+  HSWM: [healthcare, financials]    # House Ways & Means
+  SSFI: [healthcare, financials]    # Senate Finance
+  HSAP: [defense, healthcare]       # House Appropriations
+  SSAP: [defense, healthcare]       # Senate Appropriations
+  HSFA: [defense, energy]           # House Foreign Affairs
+  SSFR: [defense, energy]           # Senate Foreign Relations
+  HSHM: [defense, technology]       # House Homeland Security
+  SSGA: [defense, technology]       # Senate Homeland Sec & Gov Affairs
+  HSAG: [agriculture]               # House Agriculture
+  SSAF: [agriculture]               # Senate Agriculture
+  HSPW: [transportation, energy]    # House Transportation & Infrastructure
+  HSII: [energy]                    # House Natural Resources
+  HSSY: [technology, aerospace]     # House Science, Space & Technology
+
+# Sector -> representative tickers. A trade in one of these tickers by a member
+# whose committee oversees that sector is flagged as a committee-overlap.
+sector_tickers:
+  defense: [LMT, RTX, NOC, GD, BA, LHX, HII, LDOS, KTOS, AXON, PLTR]
+  aerospace: [BA, RTX, GE, HON, LMT, NOC, GD]
+  financials: [JPM, BAC, WFC, GS, MS, C, USB, PNC, TFC, COF, SCHW, BLK, BX, KKR, V, MA, AXP, COIN, HOOD, SOFI]
+  energy: [XOM, CVX, COP, EOG, DVN, HAL, SLB, OXY, MPC, PSX, VLO, WMB, ET, VST, CEG, NEE, DUK, SO, KMI, LNG]
+  healthcare: [JNJ, PFE, ABBV, MRK, LLY, BMY, AMGN, GILD, UNH, CVS, MRNA, HIMS, ISRG, MDT, DHR, TMO]
+  technology: [AAPL, MSFT, GOOGL, META, AMZN, NVDA, AMD, INTC, MU, AVGO, ORCL, CRM, CSCO, T, VZ, TMUS]
+  agriculture: [DE, ADM, BG, MOS, CF, NTR, TSN]
+  transportation: [UPS, FDX, DAL, UAL, AAL, LUV, UNP, CSX, NSC]
