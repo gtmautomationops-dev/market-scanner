@@ -507,28 +507,53 @@ def _is_round_price(price):
     return abs(price - round(price)) < 1e-6
 
 
-def mark_offering_purchases(conn, cfg):
+def _new_issue_window(ticker, tx_date, max_trading_days):
+    """True if `tx_date` falls within the first `max_trading_days` trading days
+    of the ticker's price history — i.e. the issuer is a recent IPO / spinoff /
+    conversion. Best-effort via yfinance; returns False if it can't be
+    determined (so condition 2 never flags on uncertainty alone)."""
+    try:
+        import yfinance as yf
+        hist = yf.Ticker(ticker).history(period="1y")
+        if hist is None or hist.empty:
+            return False
+        tx = datetime.strptime(tx_date[:10], "%Y-%m-%d").date()
+        trading_days = [d.date() if hasattr(d, "date") else d for d in hist.index]
+        # trading days on or before the transaction date within visible history
+        count = sum(1 for d in trading_days if d <= tx)
+        return 0 < count <= max_trading_days
+    except Exception:
+        return False
+
+
+def mark_offering_purchases(conn, cfg, new_issue_check=None):
     """Flag code-P transactions that are subscription/conversion offering
     participations rather than open-market conviction buys.
 
-    Primary tell (uniform-price signature): 3+ distinct insiders at the same
+    Condition 1 — uniform-price signature: 3+ distinct insiders at the same
     issuer filing code P at the *identical* price on the same transaction
     date. Open-market buys by different people almost never land on the exact
-    same price — a mutual-to-stock conversion or new-issue offering does,
-    because everyone subscribes at the fixed offering price.
+    same price; a fixed-price offering/conversion does.
 
-    These are excluded from bullish/cluster-buy scoring but kept in the DB.
-    Returns the number of transactions flagged.
+    Condition 2 — new-issue window: 3+ distinct insiders filing code P at the
+    same issuer on the same date where the issuer is a recent listing (the
+    trade falls within its first N trading days). This catches offerings where
+    the subscription price varies by a cent or two and condition 1's exact
+    match would miss it. Scoped to clustered issuers only, so the price-history
+    lookups stay cheap.
+
+    Flagged transactions are excluded from bullish/cluster-buy scoring but kept
+    in the DB. Returns the total number of flagged transactions.
     """
     sig = cfg["signals"]
     min_insiders = sig.get("offering_min_insiders", 3)
+    new_issue_check = new_issue_check or _new_issue_window
     cur = conn.cursor()
 
     # Reset then recompute so reruns pick up amended/late filings.
     cur.execute("UPDATE transactions SET is_offering_purchase=0 WHERE transaction_code='P'")
 
-    # Uniform-price groups: same issuer, same transaction_date, same price,
-    # 3+ distinct insiders filing code P.
+    # --- Condition 1: uniform-price groups (issuer, date, price), 3+ insiders
     cur.execute(
         """SELECT f.issuer_cik, t.transaction_date, t.price_per_share,
                   COUNT(DISTINCT f.insider_cik) AS n_insiders
@@ -540,9 +565,7 @@ def mark_offering_purchases(conn, cfg):
            HAVING n_insiders >= ?""",
         (min_insiders,),
     )
-    groups = cur.fetchall()
-    flagged = 0
-    for issuer_cik, tx_date, price, _n in groups:
+    for issuer_cik, tx_date, price, _n in cur.fetchall():
         cur.execute(
             """UPDATE transactions SET is_offering_purchase=1
                WHERE transaction_code='P' AND transaction_date=? AND price_per_share=?
@@ -550,9 +573,44 @@ def mark_offering_purchases(conn, cfg):
                      SELECT accession_number FROM filings WHERE issuer_cik=?)""",
             (tx_date, price, issuer_cik),
         )
-        flagged += cur.rowcount
+
+    # --- Condition 2: new-issue window for clustered issuers not fully caught
+    # by condition 1 (e.g. subscription price varies by a cent).
+    if sig.get("check_new_issue", True):
+        max_days = sig.get("new_issue_trading_days", 10)
+        cur.execute(
+            """SELECT f.issuer_cik, iss.ticker, t.transaction_date,
+                      COUNT(DISTINCT f.insider_cik) AS n,
+                      SUM(CASE WHEN t.is_offering_purchase=0 THEN 1 ELSE 0 END) AS unflagged
+               FROM transactions t
+               JOIN filings f ON t.accession_number = f.accession_number
+               JOIN issuers iss ON f.issuer_cik = iss.cik
+               WHERE t.transaction_code='P' AND t.transaction_date IS NOT NULL
+               GROUP BY f.issuer_cik, t.transaction_date
+               HAVING n >= ? AND unflagged > 0""",
+            (min_insiders,),
+        )
+        candidates = cur.fetchall()
+        cache = {}
+        for issuer_cik, ticker, tx_date, _n, _unflagged in candidates:
+            if not ticker:
+                continue
+            key = (ticker, tx_date)
+            if key not in cache:
+                cache[key] = new_issue_check(ticker, tx_date, max_days)
+            if cache[key]:
+                cur.execute(
+                    """UPDATE transactions SET is_offering_purchase=1
+                       WHERE transaction_code='P' AND transaction_date=?
+                         AND accession_number IN (
+                             SELECT accession_number FROM filings WHERE issuer_cik=?)""",
+                    (tx_date, issuer_cik),
+                )
+
     conn.commit()
-    return flagged
+    return cur.execute(
+        "SELECT COUNT(*) FROM transactions WHERE is_offering_purchase=1"
+    ).fetchone()[0]
 
 
 def offering_summary(conn, since):
@@ -651,7 +709,7 @@ def classify_filing(conn, cfg, accession):
     if offering_value > 0 and buy_value == 0 and sell_value == 0:
         price_str = f"${offering_price:,.2f}" if offering_price is not None else "the offering price"
         reasons.append(
-            f"Subscription/conversion offering purchase at fixed {price_str}. "
+            f"Subscription/conversion/new-issue offering purchase at {price_str}. "
             f"Not an open-market conviction buy."
         )
         return "OFFERING PARTICIPATION", reasons

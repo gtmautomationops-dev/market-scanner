@@ -252,6 +252,13 @@ signals:
   # never an open-market conviction buy. Flagged OFFERING PARTICIPATION and
   # excluded from bullish and cluster-buy scoring.
   offering_min_insiders: 3
+  # Condition 2 (new-issue window): for a clustered issuer (>= offering_min_insiders
+  # code-P buyers on one date) whose price varies slightly, also treat it as an
+  # offering if the issuer is a recent listing — the trade falls within its first
+  # `new_issue_trading_days` trading days of price history (checked via yfinance,
+  # scoped to clustered issuers only so lookups stay cheap). Set false to disable.
+  check_new_issue: true
+  new_issue_trading_days: 10
 
 scraper:
   # Coverage mode:

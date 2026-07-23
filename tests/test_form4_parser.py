@@ -29,6 +29,10 @@ CFG = {
         "stake_increase_bullish": 0.20,
         "stake_reduction_caution": 0.50,
         "offering_min_insiders": 3,
+        # condition-2 new-issue check is exercised in its own test with an
+        # injected stub; keep it off by default so tests stay offline.
+        "check_new_issue": False,
+        "new_issue_trading_days": 10,
     }
 }
 
@@ -269,6 +273,40 @@ def test_genuine_cluster_buy_still_bullish():
     signal, reasons = classify_filing(conn, CFG, "real-0")
     assert signal == "STRONG BULLISH", (signal, reasons)
     assert any("cluster buy" in r for r in reasons)
+
+
+def test_new_issue_window_flags_varying_price_conversion():
+    """Condition 2: a clustered conversion whose subscription price varies by a
+    cent (so condition 1's exact-price match misses it) is still flagged when
+    the issuer is a recent listing."""
+    conn = make_db()
+    for i, price in enumerate([10.00, 10.01, 9.99, 10.02]):
+        p = _buy_filing(f"330{i:02d}", f"NEW {i}", price, "2026-07-21",
+                        issuer="0000900003", ticker="NEWIPO")
+        store_filing(conn, p, f"ipo-{i}", "2026-07-21", "u")
+    cfg = {"signals": dict(CFG["signals"], check_new_issue=True)}
+    # Inject the new-issue check so the test does not hit the network.
+    flagged = mark_offering_purchases(
+        conn, cfg, new_issue_check=lambda tk, d, n: tk == "NEWIPO"
+    )
+    assert flagged == 4, flagged
+    assert classify_filing(conn, CFG, "ipo-0")[0] == "OFFERING PARTICIPATION"
+
+
+def test_new_issue_check_not_triggered_for_established_issuer():
+    """A same-day cluster at DIFFERENT prices on an ESTABLISHED (non-new-issue)
+    issuer stays a real cluster buy — condition 2 must not sweep it up."""
+    conn = make_db()
+    for i, price in enumerate([44.10, 45.02, 43.88]):
+        p = _buy_filing(f"440{i:02d}", f"BUYER {i}", price, "2026-07-21",
+                        issuer="0000900004", ticker="OLDCO")
+        store_filing(conn, p, f"old-{i}", "2026-07-21", "u")
+    cfg = {"signals": dict(CFG["signals"], check_new_issue=True)}
+    flagged = mark_offering_purchases(
+        conn, cfg, new_issue_check=lambda tk, d, n: False  # not a new issue
+    )
+    assert flagged == 0
+    assert classify_filing(conn, CFG, "old-0")[0] == "STRONG BULLISH"
 
 
 def test_offering_summary_groups_by_issuer():
