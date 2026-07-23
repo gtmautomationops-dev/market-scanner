@@ -1,6 +1,7 @@
 {
-  "run_at": "2026-07-23T21:02:39.417153+00:00",
+  "run_at": "2026-07-23T23:48:14.995886+00:00",
   "mode": "firehose",
+  "offering_purchases_flagged": 34,
   "first_run": false,
   "since": "2026-07-21",
   "form4_in_window": 1097,
@@ -788,9 +789,9 @@
     },
     {
       "accession": "0001339736-26-000014",
-      "signal": "STRONG BULLISH",
+      "signal": "OFFERING PARTICIPATION",
       "reasons": [
-        "cluster buy: 15 insiders in 30d"
+        "Subscription/conversion/new-issue offering purchase at $10.00. Not an open-market conviction buy."
       ]
     },
     {
@@ -844,9 +845,9 @@
     },
     {
       "accession": "0001409460-26-000011",
-      "signal": "STRONG BULLISH",
+      "signal": "OFFERING PARTICIPATION",
       "reasons": [
-        "cluster buy: 15 insiders in 30d"
+        "Subscription/conversion/new-issue offering purchase at $10.00. Not an open-market conviction buy."
       ]
     },
     {
@@ -1005,44 +1006,44 @@
     },
     {
       "accession": "0001729835-26-000011",
-      "signal": "STRONG BULLISH",
+      "signal": "OFFERING PARTICIPATION",
       "reasons": [
-        "cluster buy: 15 insiders in 30d"
+        "Subscription/conversion/new-issue offering purchase at $10.00. Not an open-market conviction buy."
       ]
     },
     {
       "accession": "0001729840-26-000024",
-      "signal": "STRONG BULLISH",
+      "signal": "OFFERING PARTICIPATION",
       "reasons": [
-        "cluster buy: 15 insiders in 30d"
+        "Subscription/conversion/new-issue offering purchase at $10.00. Not an open-market conviction buy."
       ]
     },
     {
       "accession": "0001729859-26-000040",
-      "signal": "STRONG BULLISH",
+      "signal": "OFFERING PARTICIPATION",
       "reasons": [
-        "cluster buy: 15 insiders in 30d"
+        "Subscription/conversion/new-issue offering purchase at $10.00. Not an open-market conviction buy."
       ]
     },
     {
       "accession": "0001729897-26-000038",
-      "signal": "STRONG BULLISH",
+      "signal": "OFFERING PARTICIPATION",
       "reasons": [
-        "cluster buy: 15 insiders in 30d"
+        "Subscription/conversion/new-issue offering purchase at $10.00. Not an open-market conviction buy."
       ]
     },
     {
       "accession": "0001731363-26-000007",
-      "signal": "STRONG BULLISH",
+      "signal": "OFFERING PARTICIPATION",
       "reasons": [
-        "cluster buy: 15 insiders in 30d"
+        "Subscription/conversion/new-issue offering purchase at $10.00. Not an open-market conviction buy."
       ]
     },
     {
       "accession": "0001731365-26-000007",
-      "signal": "STRONG BULLISH",
+      "signal": "OFFERING PARTICIPATION",
       "reasons": [
-        "cluster buy: 15 insiders in 30d"
+        "Subscription/conversion/new-issue offering purchase at $10.00. Not an open-market conviction buy."
       ]
     },
     {
@@ -1054,9 +1055,9 @@
     },
     {
       "accession": "0001752640-26-000011",
-      "signal": "STRONG BULLISH",
+      "signal": "OFFERING PARTICIPATION",
       "reasons": [
-        "cluster buy: 15 insiders in 30d"
+        "Subscription/conversion/new-issue offering purchase at $10.00. Not an open-market conviction buy."
       ]
     },
     {
@@ -1124,16 +1125,16 @@
     },
     {
       "accession": "0001813570-26-000007",
-      "signal": "STRONG BULLISH",
+      "signal": "OFFERING PARTICIPATION",
       "reasons": [
-        "cluster buy: 15 insiders in 30d"
+        "Subscription/conversion/new-issue offering purchase at $10.00. Not an open-market conviction buy."
       ]
     },
     {
       "accession": "0001813613-26-000006",
-      "signal": "STRONG BULLISH",
+      "signal": "OFFERING PARTICIPATION",
       "reasons": [
-        "cluster buy: 15 insiders in 30d"
+        "Subscription/conversion/new-issue offering purchase at $10.00. Not an open-market conviction buy."
       ]
     },
     {
@@ -1166,9 +1167,9 @@
     },
     {
       "accession": "0001839477-26-000014",
-      "signal": "STRONG BULLISH",
+      "signal": "OFFERING PARTICIPATION",
       "reasons": [
-        "cluster buy: 15 insiders in 30d"
+        "Subscription/conversion/new-issue offering purchase at $10.00. Not an open-market conviction buy."
       ]
     },
     {
@@ -1201,16 +1202,16 @@
     },
     {
       "accession": "0001949911-26-000014",
-      "signal": "STRONG BULLISH",
+      "signal": "OFFERING PARTICIPATION",
       "reasons": [
-        "cluster buy: 15 insiders in 30d"
+        "Subscription/conversion/new-issue offering purchase at $10.00. Not an open-market conviction buy."
       ]
     },
     {
       "accession": "0001957684-26-000011",
-      "signal": "STRONG BULLISH",
+      "signal": "OFFERING PARTICIPATION",
       "reasons": [
-        "cluster buy: 15 insiders in 30d"
+        "Subscription/conversion/new-issue offering purchase at $10.00. Not an open-market conviction buy."
       ]
     },
     {
@@ -1236,9 +1237,9 @@
     },
     {
       "accession": "0002142208-26-000015",
-      "signal": "STRONG BULLISH",
+      "signal": "OFFERING PARTICIPATION",
       "reasons": [
-        "cluster buy: 15 insiders in 30d"
+        "Subscription/conversion/new-issue offering purchase at $10.00. Not an open-market conviction buy."
       ]
     },
     {
