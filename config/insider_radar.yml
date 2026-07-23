@@ -246,6 +246,12 @@ signals:
   stake_increase_bullish: 0.20
   # Stake reduction above this fraction is CAUTION
   stake_reduction_caution: 0.50
+  # Offering/conversion detection: this many distinct insiders filing code P
+  # at the IDENTICAL price on the same date at one issuer marks a subscription
+  # or mutual-to-stock conversion offering — a fixed-price insider allocation,
+  # never an open-market conviction buy. Flagged OFFERING PARTICIPATION and
+  # excluded from bullish and cluster-buy scoring.
+  offering_min_insiders: 3
 
 scraper:
   # Coverage mode:

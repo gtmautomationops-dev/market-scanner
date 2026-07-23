@@ -11,7 +11,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
 import insider_radar
-from insider_radar import parse_form4_xml, classify_filing, store_filing, SCHEMA
+from insider_radar import (
+    parse_form4_xml, classify_filing, store_filing, SCHEMA,
+    mark_offering_purchases,
+)
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -25,8 +28,29 @@ CFG = {
         "routine_sell_usd": 1000000,
         "stake_increase_bullish": 0.20,
         "stake_reduction_caution": 0.50,
+        "offering_min_insiders": 3,
     }
 }
+
+
+def _buy_filing(insider_cik, insider_name, price, date, officer=False,
+                title=None, issuer="0000900001", ticker="CLBK"):
+    """Build a parsed Form 4 dict for one insider's code-P purchase."""
+    return {
+        "form_type": "4", "period_of_report": date,
+        "issuer_cik": issuer, "issuer_name": "Columbia Financial",
+        "issuer_ticker": ticker,
+        "insider_cik": insider_cik, "insider_name": insider_name,
+        "is_director": 0, "is_officer": int(officer),
+        "is_ten_percent_owner": 0, "officer_title": title, "is_10b5_1": 0,
+        "transactions": [{
+            "security_title": "Common Stock", "is_derivative": 0,
+            "transaction_date": date, "transaction_code": "P",
+            "shares": 50000, "price_per_share": price,
+            "acquired_disposed": "A", "shares_owned_after": 50000,
+            "ownership_form": "D",
+        }],
+    }
 
 
 def load_fixture(name):
@@ -189,6 +213,73 @@ def test_exercise_and_sale_below_threshold_is_neutral():
     signal, reasons = classify_filing(conn, CFG, "acc-4")
     # Routine option exercise + sale under $1M by a non-CEO/CFO officer
     assert signal == "NEUTRAL", reasons
+
+
+# ---------------------------------------------------------------- offering detection
+
+def _load_clbk_conversion(conn):
+    """15-insider-style conversion: several insiders buy code P at $10.00 same day."""
+    for i in range(5):
+        p = _buy_filing(f"000000110{i}", f"OFFICER {i}", 10.00, "2026-07-21",
+                        officer=(i == 0), title="Chief Executive Officer" if i == 0 else None)
+        store_filing(conn, p, f"clbk-{i}", "2026-07-21", "u")
+
+
+def test_conversion_flagged_as_offering_purchase():
+    conn = make_db()
+    _load_clbk_conversion(conn)
+    flagged = mark_offering_purchases(conn, CFG)
+    assert flagged == 5, flagged
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM transactions WHERE is_offering_purchase=1")
+    assert cur.fetchone()[0] == 5
+
+
+def test_conversion_not_strong_bullish():
+    conn = make_db()
+    _load_clbk_conversion(conn)
+    mark_offering_purchases(conn, CFG)
+    # Even the CEO's $500k+ buy must NOT be bullish — it is a fixed-price
+    # subscription allocation, not an open-market conviction buy.
+    signal, reasons = classify_filing(conn, CFG, "clbk-0")
+    assert signal == "OFFERING PARTICIPATION", (signal, reasons)
+    assert any("offering" in r.lower() for r in reasons)
+
+
+def test_conversion_excluded_from_cluster_buy():
+    conn = make_db()
+    _load_clbk_conversion(conn)
+    mark_offering_purchases(conn, CFG)
+    # None of the conversion filings should read as a cluster buy.
+    for i in range(5):
+        signal, _ = classify_filing(conn, CFG, f"clbk-{i}")
+        assert signal == "OFFERING PARTICIPATION", (i, signal)
+
+
+def test_genuine_cluster_buy_still_bullish():
+    """Different insiders buying at DIFFERENT prices is a real open-market
+    cluster — must stay STRONG BULLISH, not be swept up as an offering."""
+    conn = make_db()
+    for i, price in enumerate([31.20, 32.05, 30.88]):
+        p = _buy_filing(f"000000220{i}", f"BUYER {i}", price, "2026-07-21",
+                        issuer="0000900002", ticker="REAL")
+        store_filing(conn, p, f"real-{i}", "2026-07-21", "u")
+    flagged = mark_offering_purchases(conn, CFG)
+    assert flagged == 0, "distinct prices must not be flagged as an offering"
+    signal, reasons = classify_filing(conn, CFG, "real-0")
+    assert signal == "STRONG BULLISH", (signal, reasons)
+    assert any("cluster buy" in r for r in reasons)
+
+
+def test_offering_summary_groups_by_issuer():
+    conn = make_db()
+    _load_clbk_conversion(conn)
+    mark_offering_purchases(conn, CFG)
+    summary = insider_radar.offering_summary(conn, "2026-01-01")
+    assert len(summary) == 1
+    assert summary[0]["ticker"] == "CLBK"
+    assert summary[0]["insiders"] == 5
+    assert summary[0]["price"] == 10.00
 
 
 if __name__ == "__main__":

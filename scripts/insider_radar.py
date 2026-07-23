@@ -109,10 +109,12 @@ CREATE TABLE IF NOT EXISTS transactions (
     acquired_disposed TEXT,
     shares_owned_after REAL,
     ownership_form TEXT,
+    is_offering_purchase INTEGER DEFAULT 0,
     FOREIGN KEY (accession_number) REFERENCES filings(accession_number)
 );
 CREATE INDEX IF NOT EXISTS idx_filings_issuer ON filings(issuer_cik, filed_at);
 CREATE INDEX IF NOT EXISTS idx_txn_accession ON transactions(accession_number);
+CREATE INDEX IF NOT EXISTS idx_txn_code_date ON transactions(transaction_code, transaction_date);
 """
 
 
@@ -120,6 +122,11 @@ def get_db():
     DB_PATH.parent.mkdir(exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     conn.executescript(SCHEMA)
+    # Migrate older databases that predate the offering-purchase flag.
+    cols = [r[1] for r in conn.execute("PRAGMA table_info(transactions)").fetchall()]
+    if "is_offering_purchase" not in cols:
+        conn.execute("ALTER TABLE transactions ADD COLUMN is_offering_purchase INTEGER DEFAULT 0")
+        conn.commit()
     return conn
 
 
@@ -451,6 +458,10 @@ def run_firehose_scrape():
 
     pruned = prune_old_filings(conn, scfg.get("retention_days"))
 
+    # Flag subscription/conversion offering purchases before classifying, so
+    # conversion-day filing floods are excluded from bullish/cluster scoring.
+    offering_flagged = mark_offering_purchases(conn, cfg)
+
     since = dates[-1].strftime("%Y-%m-%d")
     cur.execute("SELECT accession_number FROM filings WHERE filed_at >= ?", (since,))
     classified = []
@@ -461,6 +472,7 @@ def run_firehose_scrape():
     runlog = {
         "run_at": datetime.now(timezone.utc).isoformat(),
         "mode": "firehose",
+        "offering_purchases_flagged": offering_flagged,
         "first_run": first_run,
         "since": since,
         "form4_in_window": len(index_rows),
@@ -484,6 +496,87 @@ def run_firehose_scrape():
         print(f"    {e}")
     print(f"  Runlog written to {RUNLOG_PATH}")
     return conn
+
+
+# ---------------------------------------------------------------- offering detection
+
+def _is_round_price(price):
+    """A whole-dollar price ($10.00, $25.00) as offerings are typically priced."""
+    if price is None:
+        return False
+    return abs(price - round(price)) < 1e-6
+
+
+def mark_offering_purchases(conn, cfg):
+    """Flag code-P transactions that are subscription/conversion offering
+    participations rather than open-market conviction buys.
+
+    Primary tell (uniform-price signature): 3+ distinct insiders at the same
+    issuer filing code P at the *identical* price on the same transaction
+    date. Open-market buys by different people almost never land on the exact
+    same price — a mutual-to-stock conversion or new-issue offering does,
+    because everyone subscribes at the fixed offering price.
+
+    These are excluded from bullish/cluster-buy scoring but kept in the DB.
+    Returns the number of transactions flagged.
+    """
+    sig = cfg["signals"]
+    min_insiders = sig.get("offering_min_insiders", 3)
+    cur = conn.cursor()
+
+    # Reset then recompute so reruns pick up amended/late filings.
+    cur.execute("UPDATE transactions SET is_offering_purchase=0 WHERE transaction_code='P'")
+
+    # Uniform-price groups: same issuer, same transaction_date, same price,
+    # 3+ distinct insiders filing code P.
+    cur.execute(
+        """SELECT f.issuer_cik, t.transaction_date, t.price_per_share,
+                  COUNT(DISTINCT f.insider_cik) AS n_insiders
+           FROM transactions t
+           JOIN filings f ON t.accession_number = f.accession_number
+           WHERE t.transaction_code='P' AND t.price_per_share IS NOT NULL
+             AND t.transaction_date IS NOT NULL
+           GROUP BY f.issuer_cik, t.transaction_date, t.price_per_share
+           HAVING n_insiders >= ?""",
+        (min_insiders,),
+    )
+    groups = cur.fetchall()
+    flagged = 0
+    for issuer_cik, tx_date, price, _n in groups:
+        cur.execute(
+            """UPDATE transactions SET is_offering_purchase=1
+               WHERE transaction_code='P' AND transaction_date=? AND price_per_share=?
+                 AND accession_number IN (
+                     SELECT accession_number FROM filings WHERE issuer_cik=?)""",
+            (tx_date, price, issuer_cik),
+        )
+        flagged += cur.rowcount
+    conn.commit()
+    return flagged
+
+
+def offering_summary(conn, since):
+    """Per-issuer summary of offering participations for the collapsed
+    dashboard/email section. Returns list of dicts."""
+    cur = conn.cursor()
+    cur.execute(
+        """SELECT iss.ticker, iss.name, t.price_per_share, t.transaction_date,
+                  COUNT(DISTINCT f.insider_cik) AS n
+           FROM transactions t
+           JOIN filings f ON t.accession_number = f.accession_number
+           JOIN issuers iss ON f.issuer_cik = iss.cik
+           WHERE t.is_offering_purchase=1 AND f.filed_at >= ?
+           GROUP BY f.issuer_cik, t.transaction_date, t.price_per_share
+           ORDER BY n DESC""",
+        (since,),
+    )
+    out = []
+    for ticker, name, price, tx_date, n in cur.fetchall():
+        out.append({
+            "ticker": ticker, "name": name, "price": price,
+            "tx_date": tx_date, "insiders": n,
+        })
+    return out
 
 
 # ---------------------------------------------------------------- signals
@@ -513,16 +606,22 @@ def classify_filing(conn, cfg, accession):
 
     cur.execute(
         """SELECT transaction_code, shares, price_per_share, acquired_disposed,
-                  shares_owned_after, is_derivative
+                  shares_owned_after, is_derivative, is_offering_purchase
            FROM transactions WHERE accession_number=?""",
         (accession,),
     )
     txns = cur.fetchall()
 
-    buy_value = sell_value = 0.0
+    buy_value = sell_value = offering_value = 0.0
+    offering_price = None
     pre_buy_owned = post_owned = None
-    for code, shares, price, ad, owned_after, is_deriv in txns:
+    for code, shares, price, ad, owned_after, is_deriv, is_offering in txns:
         value = (shares or 0) * (price or 0)
+        if code == "P" and is_offering:
+            # Subscription/conversion allocation — never counts as a buy.
+            offering_value += value
+            offering_price = price
+            continue
         if code == "P":
             buy_value += value
             if owned_after is not None:
@@ -544,6 +643,18 @@ def classify_filing(conn, cfg, accession):
     # or clustering.
     if is_10b5_1:
         return "NEUTRAL", ["10b5-1 planned trade"]
+
+    # Subscription/conversion offering participation is a near-guaranteed
+    # insider allocation at a fixed price, not an open-market conviction buy.
+    # It must never score bullish. If the filing's only equity action is the
+    # offering purchase, label it OFFERING PARTICIPATION.
+    if offering_value > 0 and buy_value == 0 and sell_value == 0:
+        price_str = f"${offering_price:,.2f}" if offering_price is not None else "the offering price"
+        reasons.append(
+            f"Subscription/conversion offering purchase at fixed {price_str}. "
+            f"Not an open-market conviction buy."
+        )
+        return "OFFERING PARTICIPATION", reasons
 
     # Stake change fraction
     stake_change = None
@@ -567,7 +678,7 @@ def classify_filing(conn, cfg, accession):
         """SELECT COUNT(DISTINCT f.insider_cik)
            FROM filings f JOIN transactions t ON f.accession_number = t.accession_number
            WHERE f.issuer_cik=? AND t.transaction_code='P'
-             AND f.is_10b5_1=0
+             AND f.is_10b5_1=0 AND t.is_offering_purchase=0
              AND f.filed_at BETWEEN ? AND ?""",
         (issuer_cik, window_start, filed_at),
     )
@@ -678,6 +789,9 @@ def run_scrape():
 
     prune_old_filings(conn, cfg["scraper"].get("retention_days"))
 
+    # Flag subscription/conversion offering purchases before classifying.
+    offering_flagged = mark_offering_purchases(conn, cfg)
+
     # Classify everything in the recent window
     cur.execute(
         "SELECT accession_number FROM filings WHERE filed_at >= ?", (since,)
@@ -690,6 +804,7 @@ def run_scrape():
     runlog = {
         "run_at": datetime.now(timezone.utc).isoformat(),
         "mode": "watchlist",
+        "offering_purchases_flagged": offering_flagged,
         "first_run": first_run,
         "since": since,
         "watchlist_size": len(watchlist),
@@ -726,7 +841,11 @@ def scrape_by_mode():
 if __name__ == "__main__":
     if "--dashboard-only" in sys.argv:
         from insider_dashboard import build_dashboard_and_email
-        build_dashboard_and_email(get_db(), load_config())
+        _cfg = load_config()
+        _conn = get_db()
+        # Reclassify stored history under current rules (offering detection etc.)
+        mark_offering_purchases(_conn, _cfg)
+        build_dashboard_and_email(_conn, _cfg)
     else:
         conn = scrape_by_mode()
         from insider_dashboard import build_dashboard_and_email

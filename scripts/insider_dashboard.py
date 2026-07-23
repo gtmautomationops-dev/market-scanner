@@ -13,6 +13,7 @@ SIGNAL_COLORS = {
     "BULLISH": "#4a9a5a",
     "NEUTRAL": "#8a8578",
     "CAUTION": "#b0413e",
+    "OFFERING PARTICIPATION": "#6a6a8a",
 }
 
 DASHBOARD_TEMPLATE = """<!DOCTYPE html>
@@ -166,19 +167,45 @@ def _table(rows):
     return "".join(out)
 
 
+def _offering_line(o):
+    price = f"${o['price']:,.2f}" if o["price"] is not None else "the offering price"
+    tk = o["ticker"] or o["name"] or "?"
+    return (f"{tk}: {o['insiders']} insiders participated in the offering/conversion "
+            f"subscription at {price} on {o['tx_date']}. Not scored as a signal.")
+
+
 def build_dashboard_and_email(conn, cfg):
     rows = _fetch_rows(conn, days=30)
     _classify_all(conn, cfg, rows)
 
+    # Offering/conversion participations are excluded from the bullish signal
+    # sections and shown collapsed, one summary line per issuer.
+    from insider_radar import offering_summary
+    since = (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y-%m-%d")
+    offerings = offering_summary(conn, since)
+
     order = {"STRONG BULLISH": 0, "BULLISH": 1, "CAUTION": 2, "NEUTRAL": 3}
+    excluded = ("NEUTRAL", "OFFERING PARTICIPATION")
     highlights = sorted(
-        [r for r in rows if r["signal"] != "NEUTRAL"],
+        [r for r in rows if r["signal"] not in excluded],
         key=lambda r: (order.get(r["signal"], 4), r["filed_at"]),
     )
 
     updated = datetime.now(timezone.utc).strftime("%B %d, %Y %H:%M UTC")
+    offering_html = ""
+    if offerings:
+        items = "".join(f"<li>{html.escape(_offering_line(o))}</li>" for o in offerings)
+        offering_html = (
+            f"<h2>Offering / conversion participation ({len(offerings)})</h2>"
+            f"<p class='reason' style='margin-bottom:8px'>Fixed-price subscription "
+            f"allocations from mutual-to-stock conversions and new-issue offerings. "
+            f"Not open-market conviction buys — excluded from bullish signals.</p>"
+            f"<ul style='margin-left:18px'>{items}</ul>"
+        )
+
     sections = (
         "<h2>Signals</h2>" + _table(highlights)
+        + offering_html
         + "<h2>All filings (30 days)</h2>" + _table(rows)
     )
     DOCS.mkdir(exist_ok=True)
@@ -220,6 +247,14 @@ def build_dashboard_and_email(conn, cfg):
         f"<th style='text-align:left;padding:6px 10px;color:#8a8578'>Signal</th></tr>"
         + "".join(email_rows)
         + (f"</table>" if email_rows else "</table><p style='color:#8a8578'>No non-neutral signals today.</p>")
+        + (
+            "<h2 style='font-family:Georgia,serif;font-size:16px;margin:18px 0 6px'>"
+            "Offering / conversion participation</h2>"
+            "<ul style='margin:0 0 0 18px;color:#6a6a8a;font-size:12px'>"
+            + "".join(f"<li>{html.escape(_offering_line(o))}</li>" for o in offerings[:15])
+            + "</ul>"
+            if offerings else ""
+        )
         + f"<p style='margin-top:16px'><a href='https://gtmautomationops-dev.github.io/market-scanner/insider_radar.html'>Full dashboard</a></p>"
         f"</div>"
     )
