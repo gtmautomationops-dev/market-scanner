@@ -16,6 +16,102 @@ SIGNAL_COLORS = {
     "OFFERING PARTICIPATION": "#6a6a8a",
 }
 
+
+def fetch_price_context(tickers):
+    """52-week price position for a small set of tickers (the highlighted
+    names). Bounded to highlights so this is one cheap batch call. Returns
+    {ticker: {last, hi, lo, pos}} where pos is 0.0 (at 52w low) .. 1.0 (high).
+    Best-effort: returns {} on any failure so the email still renders."""
+    tickers = sorted({t for t in tickers if t})
+    if not tickers:
+        return {}
+    out = {}
+    try:
+        import yfinance as yf
+        data = yf.download(" ".join(tickers), period="1y", auto_adjust=True,
+                           progress=False, threads=True, group_by="ticker")
+        multi = len(tickers) > 1
+        for t in tickers:
+            try:
+                if multi:
+                    if t not in data.columns.get_level_values(0):
+                        continue
+                    hist = data[t]
+                else:
+                    hist = data
+                closes = hist["Close"].dropna()
+                if closes.empty:
+                    continue
+                last, hi, lo = float(closes.iloc[-1]), float(closes.max()), float(closes.min())
+                rng = hi - lo
+                out[t] = {"last": last, "hi": hi, "lo": lo,
+                          "pos": (last - lo) / rng if rng > 0 else 0.5}
+            except Exception:
+                continue
+    except Exception:
+        pass
+    return out
+
+
+def _px_zone(px):
+    if not px:
+        return ""
+    pos = px["pos"]
+    if pos <= 0.25:
+        return "near 52w low"
+    if pos >= 0.75:
+        return "near 52w high"
+    return "mid-range"
+
+
+def _px_label(px):
+    if not px:
+        return ""
+    from_hi = (px["last"] / px["hi"] - 1) * 100 if px["hi"] else 0
+    return f"${px['last']:,.2f} · {_px_zone(px)} ({from_hi:+.0f}% vs high)"
+
+
+def _reason_html(r):
+    why = html.escape("; ".join(r["reasons"]))
+    px = r.get("px")
+    if px:
+        return (f"<span style='color:#2b2820'>{html.escape(_px_label(px))}</span>"
+                f"<br><span style='color:#8a8578'>{why}</span>")
+    return why
+
+
+def todays_read(highlights):
+    """Plain-English synthesis lines for the top of the email/dashboard.
+
+    Insider BUYING is the informative signal; selling is mostly noise, so the
+    read leads with conviction buys and only notes the narrow caution cases."""
+    strong = [r for r in highlights if r["signal"] == "STRONG BULLISH"]
+    bullish = [r for r in highlights if r["signal"] == "BULLISH"]
+    caution = [r for r in highlights if r["signal"] == "CAUTION"]
+    conviction = strong + bullish
+
+    def tag(r):
+        z = _px_zone(r.get("px"))
+        suffix = f" ({z})" if z in ("near 52w low", "near 52w high") else ""
+        return f"{r['ticker']}{suffix}"
+
+    lines = []
+    if conviction:
+        names = ", ".join(dict.fromkeys(tag(r) for r in conviction[:6]))
+        lines.append(f"{len(conviction)} conviction buy{'s' if len(conviction) != 1 else ''} today: {names}.")
+        # Call out the most compelling setup: conviction buy near 52w lows
+        near_lows = [r for r in conviction if (r.get("px") or {}).get("pos", 1) <= 0.25]
+        if near_lows:
+            lines.append("Buying into weakness (near 52-week lows): "
+                         + ", ".join(dict.fromkeys(r["ticker"] for r in near_lows[:5])) + ".")
+    else:
+        lines.append("No conviction insider buys today — tape is quiet/neutral.")
+    if caution:
+        lines.append(f"{len(caution)} caution (large discretionary / cluster sells): "
+                     + ", ".join(dict.fromkeys(r["ticker"] for r in caution[:5])) + ".")
+    lines.append("Insider buying is the reliable signal here; selling is mostly noise and is de-weighted.")
+    return lines
+
 DASHBOARD_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -161,7 +257,7 @@ def _table(rows):
             f"<td>{html.escape(_role(r))}</td>"
             f"<td>{html.escape(_txn_cell(r))}{flag}</td>"
             f"<td><span class='sig' style='background:{color}'>{r['signal']}</span></td>"
-            f"<td class='reason'>{html.escape('; '.join(r['reasons']))}</td></tr>"
+            f"<td class='reason'>{_reason_html(r)}</td></tr>"
         )
     out.append("</tbody></table>")
     return "".join(out)
@@ -191,6 +287,20 @@ def build_dashboard_and_email(conn, cfg):
         key=lambda r: (order.get(r["signal"], 4), r["filed_at"]),
     )
 
+    # Price context for the highlighted names only (one cheap batch call),
+    # then a plain-English top-line read.
+    pxmap = fetch_price_context({r["ticker"] for r in highlights})
+    for r in highlights:
+        r["px"] = pxmap.get(r["ticker"])
+    read_lines = todays_read(highlights)
+    read_html = (
+        "<div style='background:#efe7d6;border:1px solid #d8d0bf;border-radius:8px;"
+        "padding:14px 16px;margin-bottom:20px'>"
+        "<div style='font-family:\"EB Garamond\",serif;font-size:20px;margin-bottom:6px'>Today's read</div>"
+        + "".join(f"<div style='margin:2px 0'>{html.escape(l)}</div>" for l in read_lines)
+        + "</div>"
+    )
+
     updated = datetime.now(timezone.utc).strftime("%B %d, %Y %H:%M UTC")
     offering_html = ""
     if offerings:
@@ -204,7 +314,8 @@ def build_dashboard_and_email(conn, cfg):
         )
 
     sections = (
-        "<h2>Signals</h2>" + _table(highlights)
+        read_html
+        + "<h2>Signals</h2>" + _table(highlights)
         + offering_html
         + "<h2>All filings (30 days)</h2>" + _table(rows)
     )
@@ -230,16 +341,26 @@ def build_dashboard_and_email(conn, cfg):
             f"<td style='padding:6px 10px;border-bottom:1px solid #d8d0bf'>{html.escape(r['filed_at'])}</td>"
             f"<td style='padding:6px 10px;border-bottom:1px solid #d8d0bf;font-weight:bold'>{html.escape(r['ticker'] or '?')}</td>"
             f"<td style='padding:6px 10px;border-bottom:1px solid #d8d0bf'>{html.escape(r['insider'] or '?')} ({html.escape(_role(r))})</td>"
-            f"<td style='padding:6px 10px;border-bottom:1px solid #d8d0bf'>{html.escape(_txn_cell(r))}</td>"
+            f"<td style='padding:6px 10px;border-bottom:1px solid #d8d0bf'>{html.escape(_txn_cell(r))}"
+            + (f"<br><span style='color:#8a8578;font-size:11px'>{html.escape(_px_label(r.get('px')))}</span>"
+               if r.get("px") else "")
+            + f"</td>"
             f"<td style='padding:6px 10px;border-bottom:1px solid #d8d0bf'>"
             f"<span style='background:{color};color:#fff;padding:2px 8px;border-radius:8px;font-size:11px'>{r['signal']}</span></td>"
             f"</tr>"
         )
+    read_email = (
+        "<div style='background:#efe7d6;border:1px solid #d8d0bf;border-radius:8px;padding:12px 14px;margin:0 0 16px'>"
+        "<div style='font-family:Georgia,serif;font-size:18px;margin-bottom:4px'>Today's read</div>"
+        + "".join(f"<div style='margin:2px 0;font-size:13px'>{html.escape(l)}</div>" for l in read_lines)
+        + "</div>"
+    )
     email_body = (
         f"<div style='font-family:monospace;background:#f4efe6;color:#2b2820;padding:24px'>"
         f"<h1 style='font-family:Georgia,serif;font-size:26px;margin:0 0 4px'>Insider Radar</h1>"
         f"<p style='color:#8a8578;margin:0 0 16px'>{summary_line or 'No filings in window'}</p>"
-        f"<table style='border-collapse:collapse;width:100%;font-size:13px'>"
+        + read_email
+        + f"<table style='border-collapse:collapse;width:100%;font-size:13px'>"
         f"<tr><th style='text-align:left;padding:6px 10px;color:#8a8578'>Filed</th>"
         f"<th style='text-align:left;padding:6px 10px;color:#8a8578'>Ticker</th>"
         f"<th style='text-align:left;padding:6px 10px;color:#8a8578'>Insider</th>"
