@@ -1,0 +1,81 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Momentum Trader — Paper Portfolio</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin:0; background:#0b0f17; color:#e5e7eb; font:15px/1.5 -apple-system,Segoe UI,Roboto,sans-serif; }
+  .wrap { max-width:1040px; margin:0 auto; padding:24px 16px 64px; }
+  h1 { font-size:24px; margin:0 0 4px; }
+  .meta { color:#94a3b8; font-size:13px; margin-bottom:20px; }
+  .pill { display:inline-block; background:#1e293b; color:#93c5fd; border-radius:999px;
+           padding:2px 10px; font-size:12px; margin-left:6px; text-transform:uppercase; letter-spacing:.04em; }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:20px; }
+  .stat { background:#111827; border:1px solid #1f2937; border-radius:12px; padding:14px 16px; }
+  .stat .lbl { color:#94a3b8; font-size:12px; text-transform:uppercase; letter-spacing:.04em; }
+  .stat .val { font-size:22px; font-weight:700; margin-top:4px; }
+  .stat .sub { color:#64748b; font-size:12px; }
+  .banner { border-radius:12px; padding:14px 16px; margin-bottom:22px; font-size:15px; }
+  .banner.buy { background:#052e1a; border:1px solid #166534; }
+  .banner.flat { background:#1f2937; border:1px solid #374151; color:#cbd5e1; }
+  .banner .tag { font-size:11px; font-weight:700; letter-spacing:.06em; background:#166534;
+                  color:#dcfce7; border-radius:6px; padding:2px 8px; margin-right:8px; }
+  .banner.flat .tag { background:#475569; color:#e2e8f0; }
+  .banner .why { color:#86efac; font-size:12px; margin-top:6px; }
+  .banner.flat .why { color:#94a3b8; }
+  h2 { font-size:15px; text-transform:uppercase; letter-spacing:.05em; color:#94a3b8; margin:26px 0 10px; }
+  .card { background:#111827; border:1px solid #1f2937; border-radius:12px; padding:6px 4px; overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:13.5px; }
+  th { text-align:left; color:#64748b; font-weight:600; font-size:11px; text-transform:uppercase;
+        letter-spacing:.04em; padding:8px 10px; border-bottom:1px solid #1f2937; }
+  td { padding:9px 10px; border-bottom:1px solid #161e2e; vertical-align:top; }
+  tr:last-child td { border-bottom:none; }
+  .sub { color:#64748b; font-size:11.5px; }
+  .empty { color:#64748b; text-align:center; padding:20px; }
+  .disc { color:#64748b; font-size:12px; margin-top:34px; border-top:1px solid #1f2937; padding-top:16px; }
+</style></head><body><div class="wrap">
+  <h1>Momentum Trader <span class="pill">normal</span> <span class="pill">paper</span></h1>
+  <div class="meta">Simulated portfolio · one momentum pick per day · updated July 24, 2026 at 11:15 ET</div>
+
+  <div class="stats">
+    <div class="stat"><div class="lbl">Total Equity</div><div class="val">$10,000</div>
+      <div class="sub">from $10,000 start</div></div>
+    <div class="stat"><div class="lbl">Total Return</div>
+      <div class="val" style="color:#ef4444">-0.0%</div>
+      <div class="sub">$-0</div></div>
+    
+    <div class="stat"><div class="lbl">Cash</div><div class="val">$5,067</div>
+      <div class="sub">1 open positions</div></div>
+    <div class="stat"><div class="lbl">Win Rate</div><div class="val">0%</div>
+      <div class="sub">0 closed · avg +0.00R</div></div>
+  </div>
+
+  <div class="banner buy"><span class="tag">NEW ENTRY</span> <b>AAPL</b> — Apple Inc. · 15 sh @ $328.88 · stop $302.57 · target $394.66 · momentum 10.5<div class="why">+2.00 3m +20% (strong) · +1.50 1m +12% (accelerating) · +1.00 6m +33% · +0.75 above 20-day MA · +0.75 above 50-day MA · +1.00 above 200-day MA</div></div>
+
+  <h2>Equity Curve</h2>
+  <div class="card" style="padding:14px 16px"><div class="empty">Equity curve appears after the second run.</div></div>
+
+  <h2>Open Positions</h2>
+  <div class="card"><table>
+    <tr><th>Symbol</th><th>Entry Date</th><th>Entry</th><th>Last</th><th>Stop</th>
+        <th>Target</th><th>Shares</th><th>Unrealized</th><th>Status</th></tr>
+    <tr><td><b>AAPL</b><div class="sub">Apple Inc.</div></td><td>2026-07-24</td><td>$328.88</td><td>$328.88</td><td>$302.57</td><td>$394.66</td><td>15</td><td style="color:#ef4444">$-0 (-0.0%)<div class="sub">-0.00R</div></td><td class="sub">○ initial stop</td></tr>
+  </table></div>
+
+  <h2>Closed Trades</h2>
+  <div class="card"><table>
+    <tr><th>Symbol</th><th>In</th><th>Out</th><th>Entry</th><th>Exit</th>
+        <th>P&amp;L</th><th>R</th><th>Reason</th></tr>
+    <tr><td colspan="8" class="empty">No closed trades yet.</td></tr>
+  </table></div>
+
+  <h2>Top Momentum Candidates</h2>
+  <div class="card"><table>
+    <tr><th>#</th><th>Symbol</th><th>Price</th><th>Score</th><th>Why</th></tr>
+    <tr><td>1</td><td><b>AAPL</b></td><td>$328.88</td><td><b>10.5</b></td><td class="sub">+2.00 3m +20% (strong) · +1.50 1m +12% (accelerating) · +1.00 6m +33% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr><tr><td>2</td><td><b>ABBV</b></td><td>$259.32</td><td><b>10.5</b></td><td class="sub">+2.00 3m +30% (strong) · +1.50 1m +11% (accelerating) · +0.50 6m +21% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr><tr><td>3</td><td><b>PSX</b></td><td>$209.68</td><td><b>10.5</b></td><td class="sub">+2.00 3m +32% (strong) · +1.50 1m +24% (accelerating) · +1.00 6m +50% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr><tr><td>4</td><td><b>ARX.TO</b></td><td>$32.80</td><td><b>10.0</b></td><td class="sub">+2.00 3m +28% (strong) · +1.50 1m +10% (accelerating) · +1.00 6m +31% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr><tr><td>5</td><td><b>POW.TO</b></td><td>$93.29</td><td><b>10.0</b></td><td class="sub">+2.00 3m +29% (strong) · +1.00 1m +8% · +1.00 6m +36% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr><tr><td>6</td><td><b>VLO</b></td><td>$306.90</td><td><b>10.0</b></td><td class="sub">+2.00 3m +32% (strong) · +1.50 1m +27% (accelerating) · +1.00 6m +66% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr><tr><td>7</td><td><b>EOG</b></td><td>$147.35</td><td><b>9.5</b></td><td class="sub">+1.50 3m +11% · +1.50 1m +10% (accelerating) · +1.00 6m +41% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr><tr><td>8</td><td><b>TVE.TO</b></td><td>$13.57</td><td><b>9.5</b></td><td class="sub">+1.50 3m +15% · +1.50 1m +11% (accelerating) · +1.00 6m +56% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr><tr><td>9</td><td><b>MPC</b></td><td>$314.95</td><td><b>9.25</b></td><td class="sub">+2.00 3m +43% (strong) · +1.50 1m +28% (accelerating) · +1.00 6m +81% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr><tr><td>10</td><td><b>CNR.TO</b></td><td>$181.90</td><td><b>9.0</b></td><td class="sub">+1.50 3m +17% · +1.50 1m +10% (accelerating) · +1.00 6m +35% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr><tr><td>11</td><td><b>EQB.TO</b></td><td>$138.29</td><td><b>9.0</b></td><td class="sub">+1.50 3m +14% · +1.00 1m +8% · +1.00 6m +30% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr><tr><td>12</td><td><b>GWO.TO</b></td><td>$92.51</td><td><b>9.0</b></td><td class="sub">+2.00 3m +31% (strong) · +1.00 1m +4% · +1.00 6m +46% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr><tr><td>13</td><td><b>JNJ</b></td><td>$262.82</td><td><b>9.0</b></td><td class="sub">+1.50 3m +15% · +1.00 1m +9% · +0.50 6m +22% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr><tr><td>14</td><td><b>JPM</b></td><td>$350.27</td><td><b>9.0</b></td><td class="sub">+1.50 3m +13% · +1.00 1m +6% · +0.50 6m +16% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr><tr><td>15</td><td><b>LLY</b></td><td>$1202.50</td><td><b>9.0</b></td><td class="sub">+2.00 3m +31% (strong) · +1.00 1m +8% · +0.50 6m +11% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr><tr><td>16</td><td><b>PNC</b></td><td>$250.60</td><td><b>9.0</b></td><td class="sub">+1.50 3m +12% · +1.00 1m +5% · +0.50 6m +15% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr><tr><td>17</td><td><b>HDV</b></td><td>$28.75</td><td><b>8.75</b></td><td class="sub">+0.75 3m +8% · +1.00 1m +5% · +0.50 6m +14% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr><tr><td>18</td><td><b>BAC</b></td><td>$61.81</td><td><b>8.5</b></td><td class="sub">+1.50 3m +18% · +1.00 1m +7% · +0.50 6m +19% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr><tr><td>19</td><td><b>DELL</b></td><td>$443.13</td><td><b>8.5</b></td><td class="sub">+2.00 3m +109% (strong) · +0.50 1m +2% · +1.00 6m +280% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr><tr><td>20</td><td><b>MRK</b></td><td>$130.91</td><td><b>8.5</b></td><td class="sub">+1.50 3m +15% · +1.00 1m +9% · +0.50 6m +22% · +0.75 above 20-day MA · +0.75 above 50-day MA</td></tr>
+  </table></div>
+
+  <div class="disc"><b>Not financial advice.</b> This is a paper (simulated) portfolio.
+  Fills, stops and targets are book-kept at daily closing prices and ignore slippage,
+  spreads, and fees. Deterministic momentum ranking — no discretion, no guarantee of
+  future results. Built for education, inspired by the AI Momentum Trader project.</div>
+</div></body></html>
