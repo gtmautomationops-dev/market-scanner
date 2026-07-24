@@ -62,6 +62,9 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
           publish_branch: gh-pages
+          # Additive publish: never delete pages this workflow didn't generate
+          # (e.g. dashboards owned by the other workflows). Prevents cross-wiping.
+          keep_files: true
 
   email:
     # Runs on the 6:15am Pacific cron and on manual dispatch (email/both).
