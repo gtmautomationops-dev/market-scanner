@@ -34,6 +34,7 @@ forward in time.
 """
 
 import json
+import math
 import sqlite3
 import time
 from datetime import datetime, date, timezone
@@ -194,10 +195,36 @@ def _ret(closes, days):
     return None
 
 
-def momentum_score(closes, volumes):
+def _log_regression(closes, window=90):
+    """
+    Least-squares fit of log(price) vs time over the last `window` bars.
+    Returns (slope_per_day, r_squared). R² measures how *smooth* the trend is
+    (1.0 = a straight line on a log chart, ~0 = choppy noise). A high-R² uptrend
+    tends to whipsaw a trailing stop far less than a jagged one.
+    """
+    series = [p for p in (closes[-window:] if len(closes) >= window else closes) if p > 0]
+    n = len(series)
+    if n < 20:
+        return None, None
+    ys = [math.log(p) for p in series]
+    xs = list(range(n))
+    mx, my = sum(xs) / n, sum(ys) / n
+    sxx = sum((x - mx) ** 2 for x in xs)
+    if sxx == 0:
+        return None, None
+    slope = sum((xs[i] - mx) * (ys[i] - my) for i in range(n)) / sxx
+    intercept = my - slope * mx
+    ss_tot = sum((y - my) ** 2 for y in ys)
+    ss_res = sum((ys[i] - (intercept + slope * xs[i])) ** 2 for i in range(n))
+    r2 = 1 - ss_res / ss_tot if ss_tot > 0 else 0.0
+    return slope, r2
+
+
+def momentum_score(closes, volumes, bench_closes=None):
     """
     Transparent additive momentum score. Every factor contributes named points
     so the thesis and dashboard can explain *why* a name ranked where it did.
+    Pass `bench_closes` (e.g. SPY) to add a relative-strength factor.
     Returns (score, factors) where factors is a list of "±pts reason" strings.
     """
     if len(closes) < 30:
@@ -276,6 +303,24 @@ def momentum_score(closes, volumes):
     if range_pct > 0.85:   add(1.0, "near 52w high")
     elif range_pct > 0.6:  add(0.5, "upper half of range")
     elif range_pct < 0.25: add(-0.5, "near 52w low")
+
+    # 8. Relative strength vs the benchmark — is it actually beating the market?
+    # A name that only rises with the tide has no edge; leaders pull ahead of it.
+    if bench_closes is not None:
+        sr3, br3 = _ret(closes, 63), _ret(bench_closes, 63)
+        if sr3 is not None and br3 is not None:
+            rs = sr3 - br3
+            if rs > 15:    add(1.0, f"beats market by {rs:.0f}pts (3m)")
+            elif rs > 5:   add(0.5, f"beats market by {rs:.0f}pts")
+            elif rs < -5:  add(-0.75, f"lags market by {abs(rs):.0f}pts")
+
+    # 9. Trend quality — smooth, persistent trends survive a trailing stop; a
+    # jagged run at the same total return gets shaken out. Reward the smoothness.
+    slope, r2 = _log_regression(closes, 90)
+    if slope is not None:
+        if slope > 0 and r2 > 0.75:   add(1.0, f"clean trend (R²={r2:.2f})")
+        elif slope > 0 and r2 > 0.5:  add(0.5, f"steady trend (R²={r2:.2f})")
+        elif slope <= 0 and r2 > 0.5: add(-0.5, "persistent downtrend")
 
     return round(score, 2), factors
 
@@ -447,13 +492,14 @@ def run():
     con.commit()
 
     # ── 2. Rank the universe by momentum ──
+    bench_closes = prices[benchmark][0] if benchmark in prices else None
     ranked = []
     for t in universe:
         data = prices.get(t)
         if not data:
             continue
         closes, volumes = data
-        score, factors = momentum_score(closes, volumes)
+        score, factors = momentum_score(closes, volumes, bench_closes)
         if score is None:
             continue
         ranked.append({
@@ -593,20 +639,45 @@ def build_context(con, cfg, ranked, entry_action, closed_this_run, updated, pric
     closed = con.execute("SELECT * FROM trades ORDER BY exit_date DESC, id DESC").fetchall()
     closed = [dict(r) for r in closed]
     wins = [t for t in closed if t["pnl"] > 0]
+    losses = [t for t in closed if t["pnl"] < 0]
     win_rate = len(wins) / len(closed) * 100 if closed else 0
     avg_r = sum(t["r_multiple"] for t in closed) / len(closed) if closed else 0
     realized = sum(t["pnl"] for t in closed)
+
+    # Trader-grade analytics: the numbers you actually judge a strategy by.
+    gross_win = sum(t["pnl"] for t in wins)
+    gross_loss = abs(sum(t["pnl"] for t in losses))
+    profit_factor = (gross_win / gross_loss) if gross_loss > 0 else (float("inf") if gross_win > 0 else 0)
+    avg_win = gross_win / len(wins) if wins else 0
+    avg_loss = -gross_loss / len(losses) if losses else 0
+    # Expectancy per trade in R — the average edge you carry into every position.
+    expectancy_r = avg_r
+    best = max((t["pnl"] for t in closed), default=0)
+    worst = min((t["pnl"] for t in closed), default=0)
 
     equity_rows = con.execute(
         "SELECT snap_date, total_equity, benchmark_price FROM equity ORDER BY snap_date"
     ).fetchall()
     curve = [dict(r) for r in equity_rows]
 
-    # Benchmark buy-and-hold from inception.
+    # Max drawdown: the deepest peak-to-trough dip in the equity curve — how much
+    # pain the strategy has actually put you through.
+    max_dd = 0.0
+    peak = None
+    for r in curve:
+        eq = r["total_equity"]
+        peak = eq if peak is None else max(peak, eq)
+        if peak > 0:
+            max_dd = min(max_dd, (eq - peak) / peak * 100)
+
+    # Benchmark buy-and-hold from inception, plus a normalized curve for overlay.
     bench_return = None
+    bench_curve = []
     bench_prices = [r["benchmark_price"] for r in curve if r["benchmark_price"]]
     if len(bench_prices) >= 2 and bench_prices[0]:
         bench_return = (bench_prices[-1] / bench_prices[0] - 1) * 100
+        base = bench_prices[0]
+        bench_curve = [starting * (bp / base) for bp in bench_prices]
 
     return {
         "cfg": cfg, "profile": cfg["profile"], "updated": updated,
@@ -615,7 +686,10 @@ def build_context(con, cfg, ranked, entry_action, closed_this_run, updated, pric
         "open_positions": open_positions, "closed": closed,
         "win_rate": win_rate, "avg_r": avg_r, "realized": realized,
         "n_trades": len(closed), "curve": curve, "bench_return": bench_return,
-        "benchmark": cfg.get("benchmark", "SPY"),
+        "bench_curve": bench_curve, "benchmark": cfg.get("benchmark", "SPY"),
+        "profit_factor": profit_factor, "avg_win": avg_win, "avg_loss": avg_loss,
+        "expectancy_r": expectancy_r, "max_dd": max_dd, "best": best, "worst": worst,
+        "n_wins": len(wins), "n_losses": len(losses),
         "ranked": ranked[:20], "entry_action": entry_action,
         "closed_this_run": closed_this_run,
     }
@@ -623,31 +697,53 @@ def build_context(con, cfg, ranked, entry_action, closed_this_run, updated, pric
 
 # ─── DASHBOARD (GitHub Pages) ─────────────────────────────────────────────────
 
-def _sparkline(curve, width=680, height=120):
+def _top_factors(factors, n=6):
+    """Show the highest-impact reasons first (by absolute point value)."""
+    def mag(f):
+        try:
+            return abs(float(f.split()[0]))
+        except (ValueError, IndexError):
+            return 0.0
+    return " · ".join(sorted(factors, key=mag, reverse=True)[:n])
+
+
+def _sparkline(curve, bench_curve=None, benchmark="SPY", width=680, height=120):
     vals = [r["total_equity"] for r in curve]
     if len(vals) < 2:
         return '<div class="empty">Equity curve appears after the second run.</div>'
-    lo, hi = min(vals), max(vals)
+    # Share one vertical scale so the strategy and benchmark are comparable.
+    allvals = list(vals) + (list(bench_curve) if bench_curve and len(bench_curve) >= 2 else [])
+    lo, hi = min(allvals), max(allvals)
     span = (hi - lo) or 1
-    pts = []
-    for i, v in enumerate(vals):
-        x = i / (len(vals) - 1) * width
-        y = height - (v - lo) / span * (height - 10) - 5
-        pts.append(f"{x:.1f},{y:.1f}")
-    poly = " ".join(pts)
-    up = vals[-1] >= vals[0]
-    color = "#22c55e" if up else "#ef4444"
-    return (
-        f'<svg viewBox="0 0 {width} {height}" preserveAspectRatio="none" '
-        f'style="width:100%;height:{height}px">'
-        f'<polyline fill="none" stroke="{color}" stroke-width="2" points="{poly}"/>'
-        f'</svg>'
-    )
+
+    def project(series):
+        out = []
+        for i, v in enumerate(series):
+            x = i / (len(series) - 1) * width
+            y = height - (v - lo) / span * (height - 10) - 5
+            out.append(f"{x:.1f},{y:.1f}")
+        return " ".join(out)
+
+    color = "#22c55e" if vals[-1] >= vals[0] else "#ef4444"
+    svg = [f'<svg viewBox="0 0 {width} {height}" preserveAspectRatio="none" '
+           f'style="width:100%;height:{height}px">']
+    if bench_curve and len(bench_curve) >= 2:
+        svg.append(f'<polyline fill="none" stroke="#64748b" stroke-width="1.5" '
+                   f'stroke-dasharray="4 3" points="{project(bench_curve)}"/>')
+    svg.append(f'<polyline fill="none" stroke="{color}" stroke-width="2" points="{project(vals)}"/>')
+    svg.append('</svg>')
+    legend = (f'<div class="sub" style="margin-top:6px">'
+              f'<span style="color:{color}">━ strategy</span> &nbsp; '
+              f'<span style="color:#64748b">┄ {benchmark} buy &amp; hold</span></div>'
+              if bench_curve and len(bench_curve) >= 2 else "")
+    return "".join(svg) + legend
 
 
 def render_dashboard(c):
     p = c["profile"]
     ret_color = "#22c55e" if c["total_return"] >= 0 else "#ef4444"
+    pf = c["profit_factor"]
+    pf_str = "∞" if pf == float("inf") else (f"{pf:.2f}" if c["n_trades"] else "—")
 
     # Action banner
     ea = c["entry_action"]
@@ -658,7 +754,7 @@ def render_dashboard(c):
             f'<b>{d["ticker"]}</b> — {d["name"]} · {d["shares"]} sh @ '
             f'${d["plan"]["entry"]:.2f} · stop ${d["plan"]["stop"]:.2f} · '
             f'target ${d["plan"]["target"]:.2f} · momentum {d["score"]}'
-            f'<div class="why">{" · ".join(d["factors"][:6])}</div></div>'
+            f'<div class="why">{_top_factors(d["factors"], 6)}</div></div>'
         )
     else:
         note = ea[1] if ea else "no action"
@@ -704,7 +800,7 @@ def render_dashboard(c):
             out.append(
                 f'<tr><td>{i}</td><td><b>{r["ticker"]}</b></td>'
                 f'<td>${r["price"]:.2f}</td><td><b>{r["score"]}</b></td>'
-                f'<td class="sub">{" · ".join(r["factors"][:5])}</td></tr>'
+                f'<td class="sub">{_top_factors(r["factors"], 5)}</td></tr>'
             )
         return "".join(out)
 
@@ -769,7 +865,25 @@ def render_dashboard(c):
   {banner}
 
   <h2>Equity Curve</h2>
-  <div class="card" style="padding:14px 16px">{_sparkline(c['curve'])}</div>
+  <div class="card" style="padding:14px 16px">{_sparkline(c['curve'], c['bench_curve'], c['benchmark'])}</div>
+
+  <h2>Performance</h2>
+  <div class="stats">
+    <div class="stat"><div class="lbl">Max Drawdown</div>
+      <div class="val" style="color:#ef4444">{c['max_dd']:.1f}%</div>
+      <div class="sub">deepest equity dip</div></div>
+    <div class="stat"><div class="lbl">Profit Factor</div>
+      <div class="val">{pf_str}</div><div class="sub">gross win ÷ gross loss</div></div>
+    <div class="stat"><div class="lbl">Expectancy</div>
+      <div class="val" style="color:{'#22c55e' if c['expectancy_r'] >= 0 else '#ef4444'}">{c['expectancy_r']:+.2f}R</div>
+      <div class="sub">avg edge per trade</div></div>
+    <div class="stat"><div class="lbl">Avg Win / Loss</div>
+      <div class="val">${c['avg_win']:,.0f} / ${c['avg_loss']:,.0f}</div>
+      <div class="sub">{c['n_wins']}W · {c['n_losses']}L</div></div>
+    <div class="stat"><div class="lbl">Best / Worst</div>
+      <div class="val">${c['best']:,.0f} / ${c['worst']:,.0f}</div>
+      <div class="sub">single-trade P&amp;L</div></div>
+  </div>
 
   <h2>Open Positions</h2>
   <div class="card"><table>
@@ -813,7 +927,7 @@ def render_email(c):
             f'{d["ticker"]}</b> — {d["name"]}<br>{d["shares"]} sh @ ${d["plan"]["entry"]:.2f} · '
             f'stop ${d["plan"]["stop"]:.2f} · target ${d["plan"]["target"]:.2f} · '
             f'momentum {d["score"]}<br><span style="color:#15803d;font-size:12px">'
-            f'{" · ".join(d["factors"][:6])}</span></div>'
+            f'{_top_factors(d["factors"], 6)}</span></div>'
         )
     else:
         headline = "No entry"
@@ -850,6 +964,13 @@ def render_email(c):
         bench_line = (f' · vs {c["benchmark"]} {c["bench_return"]:+.1f}% '
                       f'({c["total_return"] - c["bench_return"]:+.1f} pts)')
 
+    stats_line = ""
+    if c["n_trades"]:
+        pf = c["profit_factor"]
+        pf_txt = "∞" if pf == float("inf") else f"{pf:.2f}"
+        stats_line = (f' · PF {pf_txt} · exp {c["expectancy_r"]:+.2f}R '
+                      f'· max DD {c["max_dd"]:.1f}%')
+
     subject = (f"📈 Momentum Trader [{c['profile']['name']}] — {headline} | "
                f"Equity ${c['total_equity']:,.0f} ({c['total_return']:+.1f}%)")
 
@@ -864,7 +985,7 @@ def render_email(c):
         ${c['total_equity']:,.0f} <span style="font-size:15px">({c['total_return']:+.1f}%)</span></div>
       <p style="color:#64748b;margin:2px 0 18px;font-size:13px">
         Cash ${c['cash']:,.0f} · {len(c['open_positions'])} open · win rate {c['win_rate']:.0f}%
-        · avg {c['avg_r']:+.2f}R{bench_line}</p>
+        · avg {c['avg_r']:+.2f}R{stats_line}{bench_line}</p>
 
       {action_html}
       {closed_html}

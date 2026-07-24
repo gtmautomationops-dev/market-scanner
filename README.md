@@ -61,15 +61,28 @@ Each run (`scripts/momentum_trader.py`):
 1. Marks open positions to market and manages an ATR-based stop that arms to
    breakeven at `activate_pct` and then trails `trail_pct` under the peak
    (ratchets up only).
-2. Ranks the whole universe by an explainable momentum score (multi-timeframe
-   returns, moving-average structure, RSI band, volume expansion, distance from
-   the 52-week high) — every factor's point contribution is shown.
+2. Ranks the whole universe by an explainable momentum score — every factor's
+   point contribution is shown, sorted by impact:
+   - multi-timeframe returns (1m / 3m / 6m)
+   - moving-average structure (above 20/50/200-day, bullish stacking)
+   - RSI band (rewards healthy momentum, penalizes overbought/dead)
+   - volume expansion (is the move backed by participation?)
+   - distance from the 52-week high
+   - **relative strength vs SPY** — is it actually beating the market, or just
+     drifting up with the tide?
+   - **trend quality** — the R² of a log-price regression; smooth, persistent
+     trends survive a trailing stop far better than jagged ones that whipsaw.
 3. Enters the top qualifying candidate **once per calendar day**, sizing the
    position at `deploy_fraction` of settled cash with room for `max_positions`.
 4. Book-keeps everything in `data/momentum_trader.db` and publishes:
-   - `docs/momentum_trader.html` — live dashboard (equity curve, open positions,
-     closed trades, momentum leaderboard, return vs a `SPY` buy-and-hold benchmark)
+   - `docs/momentum_trader.html` — live dashboard: equity curve with the `SPY`
+     buy-and-hold line overlaid, open positions, closed trades, momentum
+     leaderboard, and a **Performance** panel (max drawdown, profit factor,
+     expectancy in R, avg win / avg loss, best / worst trade)
    - `docs/momentum_email.html` + subject — the twice-daily email summary
+
+The main scanner dashboard (`index.html`) and the Momentum Trader dashboard link
+to each other in the header.
 
 **Risk profiles** (edit `config/momentum_trader.yml`):
 
