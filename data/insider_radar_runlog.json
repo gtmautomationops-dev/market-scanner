@@ -1,12 +1,12 @@
 {
-  "run_at": "2026-07-24T14:59:31.668986+00:00",
+  "run_at": "2026-07-24T18:23:23.572162+00:00",
   "mode": "firehose",
   "offering_purchases_flagged": 34,
   "first_run": false,
   "since": "2026-07-22",
   "form4_in_window": 1128,
-  "stored": 88,
-  "skipped_duplicate": 272,
+  "stored": 13,
+  "skipped_duplicate": 347,
   "skipped_no_open_market_txn": 768,
   "pruned_old": 0,
   "classified": [
@@ -606,13 +606,6 @@
       ]
     },
     {
-      "accession": "0001178913-26-003555",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "10b5-1 planned trade"
-      ]
-    },
-    {
       "accession": "0001031686-26-000006",
       "signal": "NEUTRAL",
       "reasons": [
@@ -1089,13 +1082,6 @@
       ]
     },
     {
-      "accession": "0001231919-26-000790",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "small buy $58,307"
-      ]
-    },
-    {
       "accession": "0001193125-26-314771",
       "signal": "NEUTRAL",
       "reasons": [
@@ -1142,6 +1128,20 @@
       "signal": "NEUTRAL",
       "reasons": [
         "sell $28,254 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001178913-26-003555",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001231919-26-000790",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "small buy $58,307"
       ]
     },
     {
