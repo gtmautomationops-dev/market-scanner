@@ -71,6 +71,41 @@ def _px_label(px):
     return f"${px['last']:,.2f} · {_px_zone(px)} ({from_hi:+.0f}% vs high)"
 
 
+def _pct(x):
+    return f"{x*100:+.1f}%" if x is not None else "n/a"
+
+
+def scorecard_html(sc):
+    """Signal scorecard block: forward return of past bullish signals vs SPY."""
+    if not sc or sc.get("total_tracked", 0) == 0:
+        return ""
+    graded = sc.get("graded", 0)
+    if graded == 0:
+        return (
+            "<div style='background:#eef0ea;border:1px solid #d8d0bf;border-radius:8px;"
+            "padding:12px 14px;margin-bottom:20px;font-size:12px;color:#6a6a6a'>"
+            f"<strong>Signal scorecard:</strong> tracking {sc['total_tracked']} bullish "
+            f"signal(s); none have aged past {sc['min_age_days']} days yet. Grades vs SPY "
+            "will appear as signals mature.</div>"
+        )
+    timing_bits = ""
+    for k in ("opportunistic", "routine"):
+        t = sc["by_timing"].get(k)
+        if t:
+            timing_bits += f" &nbsp; {k}: {_pct(t['avg_excess'])} (n={t['n']})"
+    beat = sc["beat_spy_pct"]
+    return (
+        "<div style='background:#eef0ea;border:1px solid #d8d0bf;border-radius:8px;"
+        "padding:12px 14px;margin-bottom:20px;font-size:12px;color:#4a4a4a'>"
+        f"<strong>Signal scorecard</strong> (bullish flags graded ≥{sc['min_age_days']}d after filing, "
+        f"forward return vs SPY):<br>"
+        f"n={graded} &nbsp; avg excess vs SPY: <strong>{_pct(sc['avg_excess_vs_spy'])}</strong> "
+        f"&nbsp; beat SPY: {beat*100:.0f}%{(' &nbsp;|' + timing_bits) if timing_bits else ''}<br>"
+        f"<span style='color:#8a8578'>Small, provisional sample — measures whether these "
+        f"signals actually add edge. Not a guarantee of future returns.</span></div>"
+    )
+
+
 def _reason_html(r):
     why = html.escape("; ".join(r["reasons"]))
     px = r.get("px")
@@ -99,7 +134,16 @@ def todays_read(highlights):
     if conviction:
         names = ", ".join(dict.fromkeys(tag(r) for r in conviction[:6]))
         lines.append(f"{len(conviction)} conviction buy{'s' if len(conviction) != 1 else ''} today: {names}.")
-        # Call out the most compelling setup: conviction buy near 52w lows
+        # Highest-quality subset: off-schedule ("opportunistic") buyers, the
+        # research-backed predictive kind, ideally buying into weakness.
+        opp = [r for r in conviction if r.get("timing") == "opportunistic"]
+        if opp:
+            lines.append("Off-schedule (opportunistic) buyers — historically the predictive kind: "
+                         + ", ".join(dict.fromkeys(r["ticker"] for r in opp[:5])) + ".")
+        routine = [r for r in conviction if r.get("timing") == "routine"]
+        if routine:
+            lines.append("Likely scheduled (routine) buyers — carry little signal, discount these: "
+                         + ", ".join(dict.fromkeys(r["ticker"] for r in routine[:5])) + ".")
         near_lows = [r for r in conviction if (r.get("px") or {}).get("pos", 1) <= 0.25]
         if near_lows:
             lines.append("Buying into weakness (near 52-week lows): "
@@ -178,7 +222,7 @@ def _fetch_rows(conn, days=30):
     cur.execute(
         """SELECT f.accession_number, iss.ticker, iss.name, ins.name,
                   ins.officer_title, ins.is_director, ins.is_ten_percent_owner,
-                  f.filed_at, f.form_type, f.is_10b5_1, f.raw_url
+                  f.filed_at, f.form_type, f.is_10b5_1, f.raw_url, f.insider_cik
            FROM filings f
            JOIN issuers iss ON f.issuer_cik = iss.cik
            JOIN insiders ins ON f.insider_cik = ins.cik
@@ -205,6 +249,7 @@ def _fetch_rows(conn, days=30):
             "is_director": row[5], "is_ten_pct": row[6],
             "filed_at": row[7], "form_type": row[8], "is_10b5_1": row[9],
             "url": row[10],
+            "insider_cik": row[11],
             "txns": txn_summary,
         })
     return rows
@@ -287,11 +332,23 @@ def build_dashboard_and_email(conn, cfg):
         key=lambda r: (order.get(r["signal"], 4), r["filed_at"]),
     )
 
-    # Price context for the highlighted names only (one cheap batch call),
-    # then a plain-English top-line read.
+    # Price context for the highlighted names only (one cheap batch call).
     pxmap = fetch_price_context({r["ticker"] for r in highlights})
     for r in highlights:
         r["px"] = pxmap.get(r["ticker"])
+
+    # Record/grade signals vs SPY and classify insider timing (opportunistic
+    # vs routine). Best-effort — never let analytics break the daily email.
+    scorecard = {}
+    try:
+        import insider_performance
+        perf = insider_performance.update_and_score(conn, cfg, highlights)
+        scorecard = perf["scorecard"]
+        for r in highlights:
+            r["timing"] = perf["timing"].get(r["accession"])
+    except Exception as e:
+        print(f"  performance/scorecard skipped: {e}")
+
     read_lines = todays_read(highlights)
     read_html = (
         "<div style='background:#efe7d6;border:1px solid #d8d0bf;border-radius:8px;"
@@ -315,6 +372,7 @@ def build_dashboard_and_email(conn, cfg):
 
     sections = (
         read_html
+        + scorecard_html(scorecard)
         + "<h2>Signals</h2>" + _table(highlights)
         + offering_html
         + "<h2>All filings (30 days)</h2>" + _table(rows)
@@ -360,6 +418,7 @@ def build_dashboard_and_email(conn, cfg):
         f"<h1 style='font-family:Georgia,serif;font-size:26px;margin:0 0 4px'>Insider Radar</h1>"
         f"<p style='color:#8a8578;margin:0 0 16px'>{summary_line or 'No filings in window'}</p>"
         + read_email
+        + scorecard_html(scorecard)
         + f"<table style='border-collapse:collapse;width:100%;font-size:13px'>"
         f"<tr><th style='text-align:left;padding:6px 10px;color:#8a8578'>Filed</th>"
         f"<th style='text-align:left;padding:6px 10px;color:#8a8578'>Ticker</th>"

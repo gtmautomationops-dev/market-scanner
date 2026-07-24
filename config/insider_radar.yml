@@ -260,6 +260,11 @@ signals:
   check_new_issue: true
   new_issue_trading_days: 10
 
+performance:
+  # A recorded bullish signal is graded against SPY only after it has had this
+  # many days to play out. Prevents day-one noise from dominating the scorecard.
+  min_grade_age_days: 21
+
 scraper:
   # Coverage mode:
   #   watchlist - only the tickers listed above (fast, focused, no discovery)
