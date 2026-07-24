@@ -1,0 +1,73 @@
+name: Momentum Trader - Paper Portfolio
+
+on:
+  schedule:
+    # 9:35 AM ET (13:35 UTC) - shortly after market open
+    - cron: '35 13 * * 1-5'
+    # 4:05 PM ET (20:05 UTC) - shortly after market close
+    - cron: '5 20 * * 1-5'
+  workflow_dispatch: # manual trigger
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+# Serialize with any in-flight run so two runs never commit the ledger at once.
+concurrency:
+  group: momentum-trader
+  cancel-in-progress: false
+
+jobs:
+  trade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run momentum trader (paper)
+        run: python scripts/momentum_trader.py
+
+      - name: Commit ledger and dashboard
+        run: |
+          git config user.name "momentum-trader-bot"
+          git config user.email "actions@github.com"
+          git add data/momentum_trader.db data/momentum_trader_runlog.json \
+                  docs/momentum_trader.html docs/momentum_email.html docs/momentum_email_subject.txt
+          git diff --cached --quiet || git commit -m "Momentum Trader paper run $(date -u +%Y-%m-%dT%H:%M)"
+          git pull --rebase origin main
+          git push origin main
+
+      - name: Read email subject
+        id: subject
+        run: echo "subject=$(cat docs/momentum_email_subject.txt)" >> $GITHUB_OUTPUT
+
+      - name: Send email summary
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USERNAME }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: ${{ steps.subject.outputs.subject }}
+          to: gtmautomation.ops@gmail.com
+          from: Momentum Trader <${{ secrets.GMAIL_USERNAME }}>
+          html_body: file://docs/momentum_email.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          publish_branch: gh-pages

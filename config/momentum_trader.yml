@@ -1,0 +1,52 @@
+# Momentum Trader — paper-trading configuration
+#
+# A deterministic, one-pick-per-day momentum strategy that trades a *simulated*
+# cash account. No brokerage, no real money — every fill, stop and target is
+# book-kept in data/momentum_trader.db and published to the dashboard.
+#
+# Inspired by github.com/merjua14/ai-momentum-trader, but rebuilt to fit this
+# repo's signal-and-dashboard architecture: the "AI decision layer" is replaced
+# with a transparent, reproducible momentum ranking, and execution is paper only.
+
+# Simulated account opened on the first run. Changing this AFTER the account
+# exists has no effect (the ledger in the DB is the source of truth).
+starting_cash: 10000
+
+# Active risk profile: conservative | normal | degen
+risk_profile: normal
+
+profiles:
+  conservative:
+    deploy_fraction: 0.25   # fraction of settled cash committed per entry
+    initial_stop_pct: 0.06  # floor for the ATR-based initial stop
+    activate_pct: 0.05      # gain at which the stop arms to breakeven
+    trail_pct: 0.05         # how far the trailing stop rides under the peak
+    target_r: 2.5           # profit target as a multiple of initial risk (R)
+    min_momentum: 6.0       # only enter names scoring at least this
+    max_positions: 3        # max concurrent open positions
+
+  normal:
+    deploy_fraction: 0.50
+    initial_stop_pct: 0.08
+    activate_pct: 0.06
+    trail_pct: 0.06
+    target_r: 2.5
+    min_momentum: 4.0
+    max_positions: 3
+
+  degen:
+    deploy_fraction: 1.00
+    initial_stop_pct: 0.12
+    activate_pct: 0.08
+    trail_pct: 0.08
+    target_r: 3.0
+    min_momentum: 2.0
+    max_positions: 1
+
+universe:
+  include_etfs: true        # include the ETF lists from scanner.py
+  include_canada: true      # include the .TO tickers from scanner.py
+  exclude_leveraged: true   # skip daily-reset leveraged/decay ETFs
+
+# Buy-and-hold yardstick the dashboard measures the strategy against.
+benchmark: SPY
