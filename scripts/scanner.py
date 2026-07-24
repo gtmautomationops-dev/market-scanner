@@ -730,6 +730,9 @@ header { background:var(--surface); border-bottom:1px solid var(--border); paddi
 .logo { font-family:var(--serif); font-size:20px; font-weight:600; color:var(--ink1); }
 .logo small { font-size:13px; color:var(--ink4); font-weight:400; margin-left:10px; }
 .updated { font-size:11px; color:var(--ink4); white-space:nowrap; }
+.hdr-right { display:flex; align-items:center; gap:16px; }
+.navlink { font-size:13px; color:var(--green-dk); text-decoration:none; font-weight:600; white-space:nowrap; border:1px solid var(--green-bd); background:var(--green-bg); padding:4px 10px; border-radius:6px; }
+.navlink:hover { text-decoration:underline; }
 
 .controls { background:var(--surface); border-bottom:2px solid var(--border); padding:0 20px; height:var(--controls-h); display:flex; gap:8px; align-items:center; position:sticky; top:var(--header-h); z-index:99; overflow-x:auto; }
 .controls::-webkit-scrollbar { display:none; }
@@ -857,7 +860,10 @@ tr.section-header td { background:var(--surface2); font-family:var(--serif); fon
 
 <header>
   <div class="logo">Market Scanner <small>Technical &middot; Volume &middot; Lynch</small></div>
-  <div class="updated">{updated}</div>
+  <div class="hdr-right">
+    <a class="navlink" href="momentum_trader.html">📈 Momentum Trader &rarr;</a>
+    <div class="updated">{updated}</div>
+  </div>
 </header>
 
 <div class="controls">

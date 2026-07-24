@@ -57,6 +57,45 @@ def test_volume_expansion_helps_score():
     assert boosted > base
 
 
+# ─── relative strength & trend quality ────────────────────────────────────────
+
+def test_relative_strength_rewards_market_beaters():
+    vols = [1_000_000] * 260
+    leader = _uptrend(daily=0.006)     # ~ +4.6%/wk
+    laggard_bench = _uptrend(daily=0.001)  # barely rising market
+    with_bench, factors = mt.momentum_score(leader, vols, bench_closes=laggard_bench)
+    no_bench, _ = mt.momentum_score(leader, vols)
+    # Beating a weak market should add points, and say so.
+    assert with_bench > no_bench
+    assert any("beats market" in f for f in factors)
+
+
+def test_relative_strength_penalizes_market_laggards():
+    vols = [1_000_000] * 260
+    laggard = _uptrend(daily=0.0015)
+    strong_bench = _uptrend(daily=0.006)
+    _, factors = mt.momentum_score(laggard, vols, bench_closes=strong_bench)
+    assert any("lags market" in f for f in factors)
+
+
+def test_log_regression_smooth_vs_choppy():
+    smooth = _uptrend(daily=0.004)
+    slope_s, r2_s = mt._log_regression(smooth, 90)
+    assert slope_s > 0
+    assert r2_s > 0.99  # a geometric series is a straight line in log space
+
+    # A choppy series with no trend should have a low R².
+    choppy = [100 + (5 if i % 2 else -5) for i in range(90)]
+    slope_c, r2_c = mt._log_regression(choppy, 90)
+    assert r2_c < 0.2
+
+
+def test_trend_quality_rewards_clean_uptrend():
+    vols = [1_000_000] * 260
+    _, factors = mt.momentum_score(_uptrend(daily=0.004), vols)
+    assert any("trend (R²=" in f for f in factors)
+
+
 # ─── plan_trade ───────────────────────────────────────────────────────────────
 
 PROFILE = {
