@@ -1,11 +1,9 @@
 {
-  "run_at": "2026-07-28T15:42:46.183072+00:00",
+  "run_at": "2026-07-28T21:13:10.858579+00:00",
   "risk_profile": "normal",
-  "actions": [
-    "BUY POW.TO 14sh @ $93.32 (score 12.0)"
-  ],
+  "actions": [],
   "errors": [],
-  "equity": 10207.16,
+  "equity": 10199.71,
   "cash": 1419.87,
   "open_positions": 3,
   "closed_this_run": 0
