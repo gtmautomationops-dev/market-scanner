@@ -1,12 +1,12 @@
 {
-  "run_at": "2026-07-29T15:11:52.182592+00:00",
+  "run_at": "2026-07-29T18:12:09.412053+00:00",
   "mode": "firehose",
   "offering_purchases_flagged": 41,
   "first_run": false,
   "since": "2026-07-27",
   "form4_in_window": 1466,
-  "stored": 107,
-  "skipped_duplicate": 318,
+  "stored": 2,
+  "skipped_duplicate": 423,
   "skipped_no_open_market_txn": 1041,
   "pruned_old": 0,
   "classified": [
@@ -1306,13 +1306,6 @@
       ]
     },
     {
-      "accession": "0001817646-26-000013",
-      "signal": "BULLISH",
-      "reasons": [
-        "notable buy $35,330,003"
-      ]
-    },
-    {
       "accession": "0000203596-26-000104",
       "signal": "NEUTRAL",
       "reasons": [
@@ -1387,6 +1380,13 @@
       "signal": "NEUTRAL",
       "reasons": [
         "sell $4,628,192 (non-CEO/CFO, not a caution trigger)"
+      ]
+    },
+    {
+      "accession": "0001817646-26-000013",
+      "signal": "BULLISH",
+      "reasons": [
+        "notable buy $35,330,003"
       ]
     }
   ],
