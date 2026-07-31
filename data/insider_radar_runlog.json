@@ -1,12 +1,12 @@
 {
-  "run_at": "2026-07-31T15:23:06.049196+00:00",
+  "run_at": "2026-07-31T18:24:46.370260+00:00",
   "mode": "firehose",
   "offering_purchases_flagged": 57,
   "first_run": false,
   "since": "2026-07-29",
   "form4_in_window": 1469,
-  "stored": 144,
-  "skipped_duplicate": 464,
+  "stored": 0,
+  "skipped_duplicate": 608,
   "skipped_no_open_market_txn": 861,
   "pruned_old": 0,
   "classified": [
