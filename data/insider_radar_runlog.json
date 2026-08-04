@@ -1,12 +1,12 @@
 {
-  "run_at": "2026-08-04T15:27:25.578283+00:00",
+  "run_at": "2026-08-04T18:42:43.742851+00:00",
   "mode": "firehose",
   "offering_purchases_flagged": 57,
   "first_run": false,
   "since": "2026-08-02",
   "form4_in_window": 1137,
-  "stored": 164,
-  "skipped_duplicate": 179,
+  "stored": 2,
+  "skipped_duplicate": 341,
   "skipped_no_open_market_txn": 794,
   "pruned_old": 0,
   "classified": [
@@ -1117,13 +1117,6 @@
       ]
     },
     {
-      "accession": "0002117825-26-000003",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "routine (exercise/award/gift)"
-      ]
-    },
-    {
       "accession": "0001225208-26-006889",
       "signal": "CAUTION",
       "reasons": [
@@ -1149,6 +1142,13 @@
       "signal": "CAUTION",
       "reasons": [
         "cluster sell: 4 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0002117825-26-000003",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "routine (exercise/award/gift)"
       ]
     }
   ],
