@@ -1,12 +1,12 @@
 {
-  "run_at": "2026-08-05T15:20:03.928272+00:00",
+  "run_at": "2026-08-05T18:28:03.106240+00:00",
   "mode": "firehose",
   "offering_purchases_flagged": 81,
   "first_run": false,
   "since": "2026-08-03",
   "form4_in_window": 3044,
-  "stored": 279,
-  "skipped_duplicate": 628,
+  "stored": 11,
+  "skipped_duplicate": 896,
   "skipped_no_open_market_txn": 2137,
   "pruned_old": 0,
   "classified": [
@@ -1142,13 +1142,6 @@
       "signal": "CAUTION",
       "reasons": [
         "cluster sell: 4 insiders in 30d"
-      ]
-    },
-    {
-      "accession": "0002117825-26-000003",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "routine (exercise/award/gift)"
       ]
     },
     {
@@ -2706,13 +2699,6 @@
       ]
     },
     {
-      "accession": "0001193125-26-332812",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "10b5-1 planned trade"
-      ]
-    },
-    {
       "accession": "0001213900-26-084902",
       "signal": "CAUTION",
       "reasons": [
@@ -3028,17 +3014,31 @@
       ]
     },
     {
-      "accession": "0001193125-26-333412",
-      "signal": "BULLISH",
-      "reasons": [
-        "notable buy $6,875,000"
-      ]
-    },
-    {
       "accession": "0000923738-26-000033",
       "signal": "CAUTION",
       "reasons": [
         "cluster sell: 4 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0002117825-26-000003",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "routine (exercise/award/gift)"
+      ]
+    },
+    {
+      "accession": "0001193125-26-332812",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001193125-26-333412",
+      "signal": "BULLISH",
+      "reasons": [
+        "notable buy $6,875,000"
       ]
     }
   ],
