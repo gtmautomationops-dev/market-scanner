@@ -1,12 +1,12 @@
 {
-  "run_at": "2026-08-07T14:16:44.764535+00:00",
+  "run_at": "2026-08-07T17:53:54.195244+00:00",
   "mode": "firehose",
   "offering_purchases_flagged": 89,
   "first_run": false,
   "since": "2026-08-05",
   "form4_in_window": 2697,
-  "stored": 242,
-  "skipped_duplicate": 987,
+  "stored": 9,
+  "skipped_duplicate": 1220,
   "skipped_no_open_market_txn": 1468,
   "pruned_old": 0,
   "classified": [
@@ -2496,27 +2496,6 @@
       ]
     },
     {
-      "accession": "0001683168-26-005990",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "small buy $11,590"
-      ]
-    },
-    {
-      "accession": "0001213900-26-085767",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "sell $247,974 below caution threshold"
-      ]
-    },
-    {
-      "accession": "0001513845-26-000088",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "10b5-1 planned trade"
-      ]
-    },
-    {
       "accession": "0000101382-26-000172",
       "signal": "CAUTION",
       "reasons": [
@@ -4134,13 +4113,6 @@
       ]
     },
     {
-      "accession": "0001185185-26-003311",
-      "signal": "BULLISH",
-      "reasons": [
-        "notable buy $1,817,500"
-      ]
-    },
-    {
       "accession": "0000900729-26-000014",
       "signal": "NEUTRAL",
       "reasons": [
@@ -4152,6 +4124,34 @@
       "signal": "CAUTION",
       "reasons": [
         "stake reduced 51%"
+      ]
+    },
+    {
+      "accession": "0001683168-26-005990",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "small buy $11,590"
+      ]
+    },
+    {
+      "accession": "0001213900-26-085767",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $247,974 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001513845-26-000088",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001185185-26-003311",
+      "signal": "BULLISH",
+      "reasons": [
+        "notable buy $1,817,500"
       ]
     }
   ],
