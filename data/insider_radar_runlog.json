@@ -1,12 +1,12 @@
 {
-  "run_at": "2026-08-11T14:21:51.174267+00:00",
+  "run_at": "2026-08-11T18:00:38.001437+00:00",
   "mode": "firehose",
   "offering_purchases_flagged": 130,
   "first_run": false,
   "since": "2026-08-09",
   "form4_in_window": 1109,
-  "stored": 274,
-  "skipped_duplicate": 321,
+  "stored": 9,
+  "skipped_duplicate": 586,
   "skipped_no_open_market_txn": 514,
   "pruned_old": 0,
   "classified": [
@@ -1061,13 +1061,6 @@
       ]
     },
     {
-      "accession": "0001225208-26-007037",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "sell $48,728 below caution threshold"
-      ]
-    },
-    {
       "accession": "0001478916-26-000015",
       "signal": "OFFERING PARTICIPATION",
       "reasons": [
@@ -1824,13 +1817,6 @@
       ]
     },
     {
-      "accession": "0002052113-26-000810",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "sell $10,220,261 (non-CEO/CFO, not a caution trigger)"
-      ]
-    },
-    {
       "accession": "0001493152-26-036885",
       "signal": "NEUTRAL",
       "reasons": [
@@ -1877,6 +1863,20 @@
       "signal": "NEUTRAL",
       "reasons": [
         "sell $223,744 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001225208-26-007037",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $48,728 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0002052113-26-000810",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $10,220,261 (non-CEO/CFO, not a caution trigger)"
       ]
     },
     {
