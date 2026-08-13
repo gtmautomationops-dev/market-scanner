@@ -1,12 +1,12 @@
 {
-  "run_at": "2026-08-12T20:52:22.317899+00:00",
+  "run_at": "2026-08-13T14:37:26.503124+00:00",
   "risk_profile": "normal",
   "actions": [
-    "SELL AAPL \u2014 stop loss -8.1%"
+    "BUY NET 9sh @ $325.30 (score 12.5)"
   ],
   "errors": [],
-  "equity": 9507.76,
-  "cash": 5953.62,
-  "open_positions": 2,
-  "closed_this_run": 1
+  "equity": 9561.16,
+  "cash": 3025.92,
+  "open_positions": 3,
+  "closed_this_run": 0
 }
