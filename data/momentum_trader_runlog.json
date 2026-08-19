@@ -1,12 +1,10 @@
 {
-  "run_at": "2026-08-19T14:06:26.920380+00:00",
+  "run_at": "2026-08-19T20:34:26.759101+00:00",
   "risk_profile": "normal",
-  "actions": [
-    "SELL NET \u2014 stop loss -11.4%"
-  ],
+  "actions": [],
   "errors": [],
-  "equity": 9301.69,
+  "equity": 9316.01,
   "cash": 5620.98,
   "open_positions": 2,
-  "closed_this_run": 1
+  "closed_this_run": 0
 }
