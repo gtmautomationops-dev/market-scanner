@@ -1,11 +1,9 @@
 {
-  "run_at": "2026-08-20T14:08:34.137172+00:00",
+  "run_at": "2026-08-20T20:34:49.508573+00:00",
   "risk_profile": "normal",
-  "actions": [
-    "BUY ABNB 15sh @ $184.98 (score 12.0)"
-  ],
+  "actions": [],
   "errors": [],
-  "equity": 9295.37,
+  "equity": 9252.03,
   "cash": 2846.28,
   "open_positions": 3,
   "closed_this_run": 0
