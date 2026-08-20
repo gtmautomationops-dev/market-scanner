@@ -1,13 +1,13 @@
 {
-  "run_at": "2026-08-20T14:04:08.223126+00:00",
+  "run_at": "2026-08-20T17:37:11.458360+00:00",
   "mode": "firehose",
   "offering_purchases_flagged": 192,
   "first_run": false,
   "since": "2026-08-18",
   "form4_in_window": 3528,
-  "stored": 359,
-  "skipped_duplicate": 1075,
-  "skipped_no_open_market_txn": 2084,
+  "stored": 26,
+  "skipped_duplicate": 1414,
+  "skipped_no_open_market_txn": 2088,
   "pruned_old": 0,
   "classified": [
     {
@@ -2468,76 +2468,6 @@
       ]
     },
     {
-      "accession": "0000897069-26-001698",
-      "signal": "CAUTION",
-      "reasons": [
-        "CEO/CFO non-10b5-1 sell $15,378,330"
-      ]
-    },
-    {
-      "accession": "0001752466-26-000015",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "sell $52,710 below caution threshold"
-      ]
-    },
-    {
-      "accession": "0001752466-26-000013",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "10b5-1 planned trade"
-      ]
-    },
-    {
-      "accession": "0001104659-26-098473",
-      "signal": "CAUTION",
-      "reasons": [
-        "cluster sell: 3 insiders in 30d"
-      ]
-    },
-    {
-      "accession": "0001400427-26-000007",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "routine (exercise/award/gift)"
-      ]
-    },
-    {
-      "accession": "0002040500-26-000006",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "sell $11,208 below caution threshold"
-      ]
-    },
-    {
-      "accession": "0002066778-26-000006",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "sell $120,158 below caution threshold"
-      ]
-    },
-    {
-      "accession": "0001193125-26-355927",
-      "signal": "STRONG BULLISH",
-      "reasons": [
-        "cluster buy: 3 insiders in 30d"
-      ]
-    },
-    {
-      "accession": "0001225208-26-007189",
-      "signal": "BULLISH",
-      "reasons": [
-        "stake increased 42%"
-      ]
-    },
-    {
-      "accession": "0001193125-26-354646",
-      "signal": "CAUTION",
-      "reasons": [
-        "stake reduced 100%"
-      ]
-    },
-    {
       "accession": "0001628280-26-057853",
       "signal": "NEUTRAL",
       "reasons": [
@@ -3721,13 +3651,6 @@
       ]
     },
     {
-      "accession": "0001196914-26-000004",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "10b5-1 planned trade"
-      ]
-    },
-    {
       "accession": "0001493152-26-039160",
       "signal": "BULLISH",
       "reasons": [
@@ -4881,18 +4804,84 @@
       "reasons": [
         "small buy $2,117"
       ]
+    },
+    {
+      "accession": "0000897069-26-001698",
+      "signal": "CAUTION",
+      "reasons": [
+        "CEO/CFO non-10b5-1 sell $15,378,330"
+      ]
+    },
+    {
+      "accession": "0001752466-26-000015",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $52,710 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001752466-26-000013",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001104659-26-098473",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001400427-26-000007",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "routine (exercise/award/gift)"
+      ]
+    },
+    {
+      "accession": "0002040500-26-000006",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $11,208 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0002066778-26-000006",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $120,158 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001193125-26-355927",
+      "signal": "STRONG BULLISH",
+      "reasons": [
+        "cluster buy: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001225208-26-007189",
+      "signal": "BULLISH",
+      "reasons": [
+        "stake increased 42%"
+      ]
+    },
+    {
+      "accession": "0001193125-26-354646",
+      "signal": "CAUTION",
+      "reasons": [
+        "stake reduced 100%"
+      ]
+    },
+    {
+      "accession": "0001196914-26-000004",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
     }
   ],
-  "errors": [
-    "0001140361-26-033760: Gave up after 5 retries: https://www.sec.gov/Archives/edgar/data/1056513/0001140361-26-033760.txt",
-    "0001437749-26-028482: Gave up after 5 retries: https://www.sec.gov/Archives/edgar/data/1056823/0001437749-26-028482.txt",
-    "0001437749-26-028485: Gave up after 5 retries: https://www.sec.gov/Archives/edgar/data/1056823/0001437749-26-028485.txt",
-    "0001193125-26-357088: Gave up after 5 retries: https://www.sec.gov/Archives/edgar/data/1057706/0001193125-26-357088.txt",
-    "0001628280-26-057938: Gave up after 5 retries: https://www.sec.gov/Archives/edgar/data/1061274/0001628280-26-057938.txt",
-    "0000832480-26-000025: Gave up after 5 retries: https://www.sec.gov/Archives/edgar/data/1064869/0000832480-26-000025.txt",
-    "0000832480-26-000024: Gave up after 5 retries: https://www.sec.gov/Archives/edgar/data/1064892/0000832480-26-000024.txt",
-    "0001195052-26-000008: Gave up after 5 retries: https://www.sec.gov/Archives/edgar/data/106532/0001195052-26-000008.txt",
-    "0001348568-26-000008: Gave up after 5 retries: https://www.sec.gov/Archives/edgar/data/106640/0001348568-26-000008.txt",
-    "0001193125-26-357251: Gave up after 5 retries: https://www.sec.gov/Archives/edgar/data/1068851/0001193125-26-357251.txt"
-  ]
+  "errors": []
 }
