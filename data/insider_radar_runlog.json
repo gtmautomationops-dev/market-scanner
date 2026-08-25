@@ -1,12 +1,12 @@
 {
-  "run_at": "2026-08-25T13:54:27.142897+00:00",
+  "run_at": "2026-08-25T17:36:44.093619+00:00",
   "mode": "firehose",
   "offering_purchases_flagged": 195,
   "first_run": false,
   "since": "2026-08-23",
   "form4_in_window": 1399,
-  "stored": 317,
-  "skipped_duplicate": 329,
+  "stored": 19,
+  "skipped_duplicate": 627,
   "skipped_no_open_market_txn": 753,
   "pruned_old": 0,
   "classified": [
@@ -1404,13 +1404,6 @@
       ]
     },
     {
-      "accession": "0001193125-26-363747",
-      "signal": "BULLISH",
-      "reasons": [
-        "CEO/CFO buy $7,940"
-      ]
-    },
-    {
       "accession": "0001764578-26-000006",
       "signal": "NEUTRAL",
       "reasons": [
@@ -1796,13 +1789,6 @@
       ]
     },
     {
-      "accession": "0001193125-26-361870",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "sell $30,329 below caution threshold"
-      ]
-    },
-    {
       "accession": "0001628280-26-058632",
       "signal": "CAUTION",
       "reasons": [
@@ -2020,13 +2006,6 @@
       ]
     },
     {
-      "accession": "0001213900-26-093080",
-      "signal": "BULLISH",
-      "reasons": [
-        "notable buy $20,125,000"
-      ]
-    },
-    {
       "accession": "0001628280-26-058641",
       "signal": "NEUTRAL",
       "reasons": [
@@ -2038,13 +2017,6 @@
       "signal": "NEUTRAL",
       "reasons": [
         "10b5-1 planned trade"
-      ]
-    },
-    {
-      "accession": "0001213900-26-093079",
-      "signal": "BULLISH",
-      "reasons": [
-        "notable buy $20,125,000"
       ]
     },
     {
@@ -2118,17 +2090,45 @@
       ]
     },
     {
-      "accession": "0001954722-26-000004",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "sell $498,136 below caution threshold"
-      ]
-    },
-    {
       "accession": "0000923401-26-000004",
       "signal": "NEUTRAL",
       "reasons": [
         "sell $24,450 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001193125-26-363747",
+      "signal": "BULLISH",
+      "reasons": [
+        "CEO/CFO buy $7,940"
+      ]
+    },
+    {
+      "accession": "0001193125-26-361870",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $30,329 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001213900-26-093080",
+      "signal": "BULLISH",
+      "reasons": [
+        "notable buy $20,125,000"
+      ]
+    },
+    {
+      "accession": "0001213900-26-093079",
+      "signal": "BULLISH",
+      "reasons": [
+        "notable buy $20,125,000"
+      ]
+    },
+    {
+      "accession": "0001954722-26-000004",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $498,136 below caution threshold"
       ]
     }
   ],
