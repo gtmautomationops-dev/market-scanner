@@ -1,13 +1,13 @@
 {
-  "run_at": "2026-08-25T23:16:24.373470+00:00",
+  "run_at": "2026-08-26T13:59:21.460910+00:00",
   "mode": "firehose",
   "offering_purchases_flagged": 195,
   "first_run": false,
-  "since": "2026-08-23",
-  "form4_in_window": 1399,
-  "stored": 19,
-  "skipped_duplicate": 627,
-  "skipped_no_open_market_txn": 753,
+  "since": "2026-08-24",
+  "form4_in_window": 2482,
+  "stored": 263,
+  "skipped_duplicate": 897,
+  "skipped_no_open_market_txn": 1322,
   "pruned_old": 0,
   "classified": [
     {
@@ -2129,6 +2129,1707 @@
       "signal": "NEUTRAL",
       "reasons": [
         "sell $498,136 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001628280-26-058803",
+      "signal": "CAUTION",
+      "reasons": [
+        "stake reduced 100%"
+      ]
+    },
+    {
+      "accession": "0001437749-26-028907",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001437749-26-028910",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001374545-26-000010",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001397333-26-000006",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001557979-26-000008",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001639902-26-000008",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001936006-26-000022",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0002024813-26-000010",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001213900-26-093257",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "small buy $43,175"
+      ]
+    },
+    {
+      "accession": "0001193125-26-364692",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "small buy $100,488"
+      ]
+    },
+    {
+      "accession": "0001049521-26-000060",
+      "signal": "CAUTION",
+      "reasons": [
+        "CEO/CFO non-10b5-1 sell $15,691,355"
+      ]
+    },
+    {
+      "accession": "0001049521-26-000061",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001049521-26-000062",
+      "signal": "CAUTION",
+      "reasons": [
+        "stake reduced 100%"
+      ]
+    },
+    {
+      "accession": "0001053507-26-000139",
+      "signal": "BULLISH",
+      "reasons": [
+        "notable buy $500,733"
+      ]
+    },
+    {
+      "accession": "0001437749-26-028889",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "small buy $2,230"
+      ]
+    },
+    {
+      "accession": "0001437749-26-028893",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "small buy $377"
+      ]
+    },
+    {
+      "accession": "0001070750-26-000130",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $1,320,332 (non-CEO/CFO, not a caution trigger)"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365278",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 5 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001073894-26-000001",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 4 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001106578-26-000127",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001104659-26-100839",
+      "signal": "BULLISH",
+      "reasons": [
+        "CEO/CFO buy $19,178"
+      ]
+    },
+    {
+      "accession": "0001193125-26-364272",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "small buy $3,638"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365379",
+      "signal": "CAUTION",
+      "reasons": [
+        "stake reduced 51%"
+      ]
+    },
+    {
+      "accession": "0001235110-26-000064",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365628",
+      "signal": "STRONG BULLISH",
+      "reasons": [
+        "CEO/CFO non-10b5-1 buy $1,117,700"
+      ]
+    },
+    {
+      "accession": "0001628280-26-058970",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001882641-26-000008",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $3,662,663 (non-CEO/CFO, not a caution trigger)"
+      ]
+    },
+    {
+      "accession": "0001142618-26-000005",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $957,660 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001628280-26-058879",
+      "signal": "CAUTION",
+      "reasons": [
+        "stake reduced 69%"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365295",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365658",
+      "signal": "CAUTION",
+      "reasons": [
+        "CEO/CFO non-10b5-1 sell $88,514,435"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365660",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001193125-26-364989",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365006",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001186173-26-000001",
+      "signal": "BULLISH",
+      "reasons": [
+        "notable buy $432,002"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365298",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001214659-26-010853",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $64,078 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001012975-26-000827",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $3,000,000 (non-CEO/CFO, not a caution trigger)"
+      ]
+    },
+    {
+      "accession": "0001221213-26-000005",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $174,250 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365149",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001242654-26-000015",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0002077096-26-000235",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001012975-26-000826",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $3,000,000 (non-CEO/CFO, not a caution trigger)"
+      ]
+    },
+    {
+      "accession": "0001610717-26-000387",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365134",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $1,897,500 (non-CEO/CFO, not a caution trigger)"
+      ]
+    },
+    {
+      "accession": "0001493152-26-040056",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "small buy $44,019"
+      ]
+    },
+    {
+      "accession": "0001300148-26-000007",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $388,000 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001899394-26-000008",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $145,830 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001283661-26-000014",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $94,268 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001437749-26-028951",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001308911-26-000007",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 8 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001493152-26-040055",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $166,980 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0000950103-26-012875",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "small buy $24,662"
+      ]
+    },
+    {
+      "accession": "0001315098-26-000177",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0000780571-26-000200",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 8 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0000919574-26-005708",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $32,057,250 (non-CEO/CFO, not a caution trigger)"
+      ]
+    },
+    {
+      "accession": "0001321402-26-000019",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 8 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001225208-26-007317",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001327111-26-000006",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 4 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001439115-26-000007",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $533,600 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001628280-26-058959",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001398344-26-015537",
+      "signal": "BULLISH",
+      "reasons": [
+        "stake increased 67%"
+      ]
+    },
+    {
+      "accession": "0001733121-26-000012",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 4 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001231919-26-001062",
+      "signal": "BULLISH",
+      "reasons": [
+        "notable buy $20,790,321"
+      ]
+    },
+    {
+      "accession": "0001350103-26-000005",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $142,100 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0000950103-26-012871",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0000950103-26-012872",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001628280-26-058920",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $62,958 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001493152-26-040045",
+      "signal": "BULLISH",
+      "reasons": [
+        "stake increased 67%"
+      ]
+    },
+    {
+      "accession": "0001654954-26-007865",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 5 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001654954-26-007866",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 5 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001654954-26-007867",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 5 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001654954-26-007868",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "small buy $14,200"
+      ]
+    },
+    {
+      "accession": "0002057569-26-000030",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0002005037-26-000012",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $1,535,000 (non-CEO/CFO, not a caution trigger)"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365206",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $719,209 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001564533-26-000012",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $3,866,404 (non-CEO/CFO, not a caution trigger)"
+      ]
+    },
+    {
+      "accession": "0001492597-26-000004",
+      "signal": "CAUTION",
+      "reasons": [
+        "stake reduced 77%"
+      ]
+    },
+    {
+      "accession": "0000063296-26-000090",
+      "signal": "STRONG BULLISH",
+      "reasons": [
+        "cluster buy: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365668",
+      "signal": "CAUTION",
+      "reasons": [
+        "CEO/CFO non-10b5-1 sell $3,551,470"
+      ]
+    },
+    {
+      "accession": "0000780571-26-000198",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 8 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001869194-26-000011",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 8 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001987188-26-000009",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 8 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0002034148-26-000007",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 8 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0002044416-26-000008",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 8 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0002088887-26-000007",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 8 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0002093095-26-000007",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 8 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001437749-26-028880",
+      "signal": "STRONG BULLISH",
+      "reasons": [
+        "cluster buy: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365418",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001464521-26-000139",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001437749-26-028913",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $29,031 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0002117905-26-000021",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $20,284,747 (non-CEO/CFO, not a caution trigger)"
+      ]
+    },
+    {
+      "accession": "0002022936-26-000013",
+      "signal": "BULLISH",
+      "reasons": [
+        "notable buy $2,278,800"
+      ]
+    },
+    {
+      "accession": "0001475597-26-000214",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $2,791 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001475597-26-000216",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $2,539 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001476220-26-000034",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001225208-26-007316",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 5 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001628280-26-058967",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "small buy $100,085"
+      ]
+    },
+    {
+      "accession": "0001492528-26-000004",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001492597-26-000003",
+      "signal": "CAUTION",
+      "reasons": [
+        "stake reduced 85%"
+      ]
+    },
+    {
+      "accession": "0002097345-26-000012",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "small buy $112,904"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365205",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $21,687 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001628280-26-058969",
+      "signal": "CAUTION",
+      "reasons": [
+        "stake reduced 100%"
+      ]
+    },
+    {
+      "accession": "0001510281-26-000279",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $1,020,110 (non-CEO/CFO, not a caution trigger)"
+      ]
+    },
+    {
+      "accession": "0001517413-26-000250",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0000950103-26-012856",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001536588-26-000028",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "small buy $20,845"
+      ]
+    },
+    {
+      "accession": "0001628280-26-058874",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001727995-26-000006",
+      "signal": "STRONG BULLISH",
+      "reasons": [
+        "cluster buy: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001752395-26-000002",
+      "signal": "STRONG BULLISH",
+      "reasons": [
+        "cluster buy: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001628280-26-058912",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $147,741 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001493152-26-040104",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $200,120 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365200",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $13,044 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0000780571-26-000208",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 8 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001769573-26-000020",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $37,033 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0002148390-26-000006",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $11,655 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001193125-26-364044",
+      "signal": "BULLISH",
+      "reasons": [
+        "notable buy $10,418,400"
+      ]
+    },
+    {
+      "accession": "0002073587-26-000030",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001931555-26-000007",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001214659-26-010827",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 6 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001214659-26-010828",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 6 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001214659-26-010829",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 6 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001214659-26-010830",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 6 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001214659-26-010831",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 6 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001214659-26-010832",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 6 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001596532-26-000214",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001837798-26-000013",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $355,946 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001601099-26-000051",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0000929638-26-003208",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365297",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001804729-26-000020",
+      "signal": "CAUTION",
+      "reasons": [
+        "stake reduced 63%"
+      ]
+    },
+    {
+      "accession": "0001619717-26-000011",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $612,819 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0000892251-26-000152",
+      "signal": "CAUTION",
+      "reasons": [
+        "CEO/CFO non-10b5-1 sell $9,969,094"
+      ]
+    },
+    {
+      "accession": "0001437749-26-028917",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365133",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001610717-26-000388",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001650164-26-000185",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0000921895-26-002305",
+      "signal": "BULLISH",
+      "reasons": [
+        "notable buy $2,089,169"
+      ]
+    },
+    {
+      "accession": "0000780571-26-000212",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 8 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001675644-26-000085",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $26,068 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365193",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365404",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365412",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0000905148-26-003910",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0000313927-26-000302",
+      "signal": "CAUTION",
+      "reasons": [
+        "stake reduced 77%"
+      ]
+    },
+    {
+      "accession": "0001699604-26-000010",
+      "signal": "STRONG BULLISH",
+      "reasons": [
+        "cluster buy: 5 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001193125-26-364066",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001193125-26-364067",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001812746-26-000010",
+      "signal": "BULLISH",
+      "reasons": [
+        "notable buy $1,082,664"
+      ]
+    },
+    {
+      "accession": "0001628280-26-058766",
+      "signal": "BULLISH",
+      "reasons": [
+        "notable buy $874,620"
+      ]
+    },
+    {
+      "accession": "0001104659-26-100504",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "small buy $33,202"
+      ]
+    },
+    {
+      "accession": "0002024250-26-000033",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0002113721-26-000016",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001910573-26-000013",
+      "signal": "BULLISH",
+      "reasons": [
+        "CEO/CFO buy $6,420"
+      ]
+    },
+    {
+      "accession": "0000821189-26-000169",
+      "signal": "CAUTION",
+      "reasons": [
+        "CEO/CFO non-10b5-1 sell $5,466,670"
+      ]
+    },
+    {
+      "accession": "0001104659-26-100600",
+      "signal": "BULLISH",
+      "reasons": [
+        "CEO/CFO buy $147,714"
+      ]
+    },
+    {
+      "accession": "0001437749-26-028892",
+      "signal": "STRONG BULLISH",
+      "reasons": [
+        "cluster buy: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0002127484-26-000015",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001104659-26-100924",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $3,280 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001104659-26-100926",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $19,616 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365107",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001743079-26-000002",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $216,001 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001628280-26-058824",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001104659-26-100826",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001751051-26-000014",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $332,820 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0000813672-26-000095",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0000043920-26-000130",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 7 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001437749-26-028884",
+      "signal": "STRONG BULLISH",
+      "reasons": [
+        "cluster buy: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001772144-26-000002",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001140361-26-034330",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $141,054 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001104659-26-100610",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001783879-26-000134",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001784973-26-000007",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001213900-26-093370",
+      "signal": "CAUTION",
+      "reasons": [
+        "CEO/CFO non-10b5-1 sell $2,541,489"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365187",
+      "signal": "CAUTION",
+      "reasons": [
+        "stake reduced 100%"
+      ]
+    },
+    {
+      "accession": "0000780571-26-000204",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 8 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001866154-26-000006",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 4 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001907345-26-000006",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 4 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001834249-26-000024",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0000025475-26-000076",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $44,161 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001856304-26-000005",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $252,883 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0000905148-26-003911",
+      "signal": "BULLISH",
+      "reasons": [
+        "CEO/CFO buy $24,831"
+      ]
+    },
+    {
+      "accession": "0001140361-26-034358",
+      "signal": "BULLISH",
+      "reasons": [
+        "notable buy $5,723,741"
+      ]
+    },
+    {
+      "accession": "0001819848-26-000444",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0000780571-26-000202",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 8 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001628280-26-058939",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $2,302 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365144",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $6,273 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365147",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $6,273 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001877346-26-000021",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 4 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0002059765-26-000003",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0002080717-26-000011",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0002146790-26-000004",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0002146828-26-000004",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0002147680-26-000002",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001225208-26-007328",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $399,410 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001213900-26-093307",
+      "signal": "BULLISH",
+      "reasons": [
+        "CEO/CFO buy $136,080"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365546",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 4 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365550",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 4 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365552",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 4 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365554",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365558",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 4 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001861524-26-000009",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365324",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "small buy $1,547"
+      ]
+    },
+    {
+      "accession": "0001213900-26-093335",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001950719-26-000001",
+      "signal": "CAUTION",
+      "reasons": [
+        "stake reduced 100%"
+      ]
+    },
+    {
+      "accession": "0001988855-26-000011",
+      "signal": "BULLISH",
+      "reasons": [
+        "notable buy $9,000,000"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365116",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001940928-26-000024",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0002067233-26-000019",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001628280-26-058886",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 5 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001628280-26-058889",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 5 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001628280-26-058891",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 5 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001628280-26-058893",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 5 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001628280-26-058894",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 5 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0000849399-26-000040",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $1,376,407 (non-CEO/CFO, not a caution trigger)"
+      ]
+    },
+    {
+      "accession": "0001916048-26-000012",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0000780571-26-000210",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 8 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001926221-26-000008",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $678,360 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001193125-26-364990",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365202",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001937214-26-000002",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 4 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0002020220-26-000020",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0000876523-26-000066",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0001950665-26-000004",
+      "signal": "STRONG BULLISH",
+      "reasons": [
+        "cluster buy: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0002028403-26-000013",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $413,241 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001962136-26-000001",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 4 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001964789-26-000038",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0002116974-26-000004",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0000780571-26-000206",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 8 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0000884590-26-000001",
+      "signal": "CAUTION",
+      "reasons": [
+        "cluster sell: 4 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001628280-26-058964",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $10,631 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001628280-26-058961",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
+      ]
+    },
+    {
+      "accession": "0002035989-26-000071",
+      "signal": "STRONG BULLISH",
+      "reasons": [
+        "cluster buy: 7 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0000731766-26-000201",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $455,910 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001104659-26-100943",
+      "signal": "BULLISH",
+      "reasons": [
+        "CEO/CFO buy $25,670"
+      ]
+    },
+    {
+      "accession": "0001493152-26-039953",
+      "signal": "STRONG BULLISH",
+      "reasons": [
+        "cluster buy: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001193125-26-365617",
+      "signal": "CAUTION",
+      "reasons": [
+        "stake reduced 59%"
+      ]
+    },
+    {
+      "accession": "0001193125-26-364117",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $38,712 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0002136935-26-000004",
+      "signal": "BULLISH",
+      "reasons": [
+        "CEO/CFO buy $49,456"
+      ]
+    },
+    {
+      "accession": "0002141866-26-000004",
+      "signal": "STRONG BULLISH",
+      "reasons": [
+        "cluster buy: 5 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0000935596-26-000019",
+      "signal": "BULLISH",
+      "reasons": [
+        "notable buy $377,404"
+      ]
+    },
+    {
+      "accession": "0002089133-26-000008",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $14,118 below caution threshold"
       ]
     }
   ],
