@@ -1,12 +1,12 @@
 {
-  "run_at": "2026-08-27T04:09:42.915670+00:00",
+  "run_at": "2026-08-27T22:53:45.898566+00:00",
   "mode": "firehose",
   "offering_purchases_flagged": 198,
   "first_run": false,
   "since": "2026-08-25",
   "form4_in_window": 2115,
-  "stored": 276,
-  "skipped_duplicate": 819,
+  "stored": 20,
+  "skipped_duplicate": 1075,
   "skipped_no_open_market_txn": 1020,
   "pruned_old": 0,
   "classified": [
@@ -1705,13 +1705,6 @@
       ]
     },
     {
-      "accession": "0002089133-26-000008",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "sell $14,118 below caution threshold"
-      ]
-    },
-    {
       "accession": "0001493152-26-040234",
       "signal": "BULLISH",
       "reasons": [
@@ -2265,13 +2258,6 @@
       ]
     },
     {
-      "accession": "0001240807-26-000006",
-      "signal": "CAUTION",
-      "reasons": [
-        "stake reduced 100%"
-      ]
-    },
-    {
       "accession": "0002005037-26-000013",
       "signal": "NEUTRAL",
       "reasons": [
@@ -2762,13 +2748,6 @@
       ]
     },
     {
-      "accession": "0001240810-26-000009",
-      "signal": "CAUTION",
-      "reasons": [
-        "stake reduced 100%"
-      ]
-    },
-    {
       "accession": "0001641792-26-000008",
       "signal": "STRONG BULLISH",
       "reasons": [
@@ -3070,13 +3049,6 @@
       ]
     },
     {
-      "accession": "0001240810-26-000010",
-      "signal": "CAUTION",
-      "reasons": [
-        "stake reduced 100%"
-      ]
-    },
-    {
       "accession": "0001872886-26-000009",
       "signal": "NEUTRAL",
       "reasons": [
@@ -3088,20 +3060,6 @@
       "signal": "NEUTRAL",
       "reasons": [
         "10b5-1 planned trade"
-      ]
-    },
-    {
-      "accession": "0001785237-26-000007",
-      "signal": "CAUTION",
-      "reasons": [
-        "stake reduced 100%"
-      ]
-    },
-    {
-      "accession": "0001785549-26-000007",
-      "signal": "CAUTION",
-      "reasons": [
-        "stake reduced 100%"
       ]
     },
     {
@@ -3343,20 +3301,6 @@
       ]
     },
     {
-      "accession": "0001193125-26-366677",
-      "signal": "OFFERING PARTICIPATION",
-      "reasons": [
-        "Subscription/conversion/new-issue offering purchase at $9.27. Not an open-market conviction buy."
-      ]
-    },
-    {
-      "accession": "0001193125-26-366683",
-      "signal": "OFFERING PARTICIPATION",
-      "reasons": [
-        "Subscription/conversion/new-issue offering purchase at $9.27. Not an open-market conviction buy."
-      ]
-    },
-    {
       "accession": "0001878313-26-000079",
       "signal": "NEUTRAL",
       "reasons": [
@@ -3371,24 +3315,10 @@
       ]
     },
     {
-      "accession": "0001193125-26-366682",
-      "signal": "OFFERING PARTICIPATION",
-      "reasons": [
-        "Subscription/conversion/new-issue offering purchase at $9.27. Not an open-market conviction buy."
-      ]
-    },
-    {
       "accession": "0000723188-26-000106",
       "signal": "BULLISH",
       "reasons": [
         "stake increased 1221%"
-      ]
-    },
-    {
-      "accession": "0001917389-26-000012",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "10b5-1 planned trade"
       ]
     },
     {
@@ -3564,6 +3494,76 @@
       "signal": "NEUTRAL",
       "reasons": [
         "sell $313,389 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0002089133-26-000008",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $14,118 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001240807-26-000006",
+      "signal": "CAUTION",
+      "reasons": [
+        "stake reduced 100%"
+      ]
+    },
+    {
+      "accession": "0001240810-26-000009",
+      "signal": "CAUTION",
+      "reasons": [
+        "stake reduced 100%"
+      ]
+    },
+    {
+      "accession": "0001240810-26-000010",
+      "signal": "CAUTION",
+      "reasons": [
+        "stake reduced 100%"
+      ]
+    },
+    {
+      "accession": "0001785237-26-000007",
+      "signal": "CAUTION",
+      "reasons": [
+        "stake reduced 100%"
+      ]
+    },
+    {
+      "accession": "0001785549-26-000007",
+      "signal": "CAUTION",
+      "reasons": [
+        "stake reduced 100%"
+      ]
+    },
+    {
+      "accession": "0001193125-26-366677",
+      "signal": "OFFERING PARTICIPATION",
+      "reasons": [
+        "Subscription/conversion/new-issue offering purchase at $9.27. Not an open-market conviction buy."
+      ]
+    },
+    {
+      "accession": "0001193125-26-366683",
+      "signal": "OFFERING PARTICIPATION",
+      "reasons": [
+        "Subscription/conversion/new-issue offering purchase at $9.27. Not an open-market conviction buy."
+      ]
+    },
+    {
+      "accession": "0001193125-26-366682",
+      "signal": "OFFERING PARTICIPATION",
+      "reasons": [
+        "Subscription/conversion/new-issue offering purchase at $9.27. Not an open-market conviction buy."
+      ]
+    },
+    {
+      "accession": "0001917389-26-000012",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
       ]
     }
   ],
