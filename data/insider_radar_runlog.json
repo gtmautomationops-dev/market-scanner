@@ -1,9 +1,9 @@
 {
-  "run_at": "2026-08-31T23:36:28.711828+00:00",
+  "run_at": "2026-09-01T01:29:55.567297+00:00",
   "mode": "firehose",
   "offering_purchases_flagged": 202,
   "first_run": false,
-  "since": "2026-08-29",
+  "since": "2026-08-30",
   "form4_in_window": 0,
   "stored": 0,
   "skipped_duplicate": 0,
