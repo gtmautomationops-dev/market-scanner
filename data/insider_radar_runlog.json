@@ -1,12 +1,12 @@
 {
-  "run_at": "2026-09-03T17:01:23.392799+00:00",
+  "run_at": "2026-09-03T19:44:20.779346+00:00",
   "mode": "firehose",
   "offering_purchases_flagged": 217,
   "first_run": false,
   "since": "2026-09-01",
   "form4_in_window": 2771,
-  "stored": 259,
-  "skipped_duplicate": 719,
+  "stored": 11,
+  "skipped_duplicate": 967,
   "skipped_no_open_market_txn": 1793,
   "pruned_old": 0,
   "classified": [
@@ -1513,27 +1513,6 @@
       "signal": "CAUTION",
       "reasons": [
         "stake reduced 100%"
-      ]
-    },
-    {
-      "accession": "0001284489-26-000034",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "routine (exercise/award/gift)"
-      ]
-    },
-    {
-      "accession": "0001284489-26-000032",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "sell $87,000 below caution threshold"
-      ]
-    },
-    {
-      "accession": "0000929638-26-003399",
-      "signal": "CAUTION",
-      "reasons": [
-        "CEO/CFO non-10b5-1 sell $3,172,512"
       ]
     },
     {
@@ -3252,13 +3231,6 @@
       ]
     },
     {
-      "accession": "0001292814-26-004452",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "sell $42,901 below caution threshold"
-      ]
-    },
-    {
       "accession": "0000950142-26-002485",
       "signal": "NEUTRAL",
       "reasons": [
@@ -3280,17 +3252,45 @@
       ]
     },
     {
-      "accession": "0000899140-26-001046",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "sell $944,506 below caution threshold"
-      ]
-    },
-    {
       "accession": "0000923401-26-000009",
       "signal": "NEUTRAL",
       "reasons": [
         "sell $71,818 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001284489-26-000034",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "routine (exercise/award/gift)"
+      ]
+    },
+    {
+      "accession": "0001284489-26-000032",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $87,000 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0000929638-26-003399",
+      "signal": "CAUTION",
+      "reasons": [
+        "CEO/CFO non-10b5-1 sell $3,172,512"
+      ]
+    },
+    {
+      "accession": "0001292814-26-004452",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $42,901 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0000899140-26-001046",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $944,506 below caution threshold"
       ]
     }
   ],
