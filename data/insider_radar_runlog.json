@@ -1,12 +1,12 @@
 {
-  "run_at": "2026-09-04T16:52:09.074908+00:00",
+  "run_at": "2026-09-04T19:25:15.981559+00:00",
   "mode": "firehose",
   "offering_purchases_flagged": 223,
   "first_run": false,
   "since": "2026-09-02",
   "form4_in_window": 3703,
-  "stored": 403,
-  "skipped_duplicate": 971,
+  "stored": 4,
+  "skipped_duplicate": 1370,
   "skipped_no_open_market_txn": 2329,
   "pruned_old": 0,
   "classified": [
@@ -1751,20 +1751,6 @@
       "signal": "NEUTRAL",
       "reasons": [
         "sell $71,818 below caution threshold"
-      ]
-    },
-    {
-      "accession": "0001292814-26-004452",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "sell $42,901 below caution threshold"
-      ]
-    },
-    {
-      "accession": "0000899140-26-001046",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "sell $944,506 below caution threshold"
       ]
     },
     {
@@ -4558,6 +4544,20 @@
       "signal": "NEUTRAL",
       "reasons": [
         "sell $36,302 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001292814-26-004452",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $42,901 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0000899140-26-001046",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $944,506 below caution threshold"
       ]
     }
   ],
