@@ -1,11 +1,11 @@
 {
-  "run_at": "2026-09-04T18:47:53.276511+00:00",
+  "run_at": "2026-09-05T00:48:45.740614+00:00",
   "first_run": false,
-  "since": "2026-08-25",
-  "ptrs_in_window": 10,
-  "filings_stored": 0,
-  "trades_stored": 0,
-  "skipped_duplicate": 10,
+  "since": "2026-08-26",
+  "ptrs_in_window": 8,
+  "filings_stored": 1,
+  "trades_stored": 1,
+  "skipped_duplicate": 7,
   "unparseable_pdfs": 0,
   "unmatched_members": 0,
   "errors": []
