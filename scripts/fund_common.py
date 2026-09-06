@@ -513,6 +513,18 @@ def write_agent_outputs(agent_slug, dashboard_html, email_html, subject):
     (DOCS / f"{agent_slug}_email_subject.txt").write_text(subject, encoding="utf-8")
 
 
+def write_send_flag(agent_slug, should_send):
+    """
+    Write a tiny 'true'/'false' flag the workflow reads to decide whether to
+    actually send the email this run. The dashboard is published every run
+    regardless — only the email is gated, so 'when needed' means fewer emails,
+    never less data. Lives at the repo root (transient, not committed).
+    """
+    (ROOT / f"{agent_slug}.send").write_text(
+        "true" if should_send else "false", encoding="utf-8")
+    return bool(should_send)
+
+
 def write_runlog(agent_slug, payload):
     DATA.mkdir(exist_ok=True)
     payload = {"run_at": datetime.now(timezone.utc).isoformat(), **payload}

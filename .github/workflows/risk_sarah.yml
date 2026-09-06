@@ -47,11 +47,19 @@ jobs:
           git pull --rebase origin main
           git push origin main
 
+      # Sarah emails "when needed" — the script writes risk_sarah.send=true only
+      # when there's something worth your attention (see notify_level in the config).
+      - name: Should Sarah email?
+        id: gate
+        run: echo "send=$(cat risk_sarah.send 2>/dev/null || echo false)" >> $GITHUB_OUTPUT
+
       - name: Read email subject
+        if: steps.gate.outputs.send == 'true'
         id: subject
         run: echo "subject=$(cat docs/risk_sarah_email_subject.txt)" >> $GITHUB_OUTPUT
 
       - name: Send risk email
+        if: steps.gate.outputs.send == 'true'
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com

@@ -348,6 +348,17 @@ def run():
     play = defined_risk_play(top_pick) if top_pick else None
     sentiment = flow_sentiment(scored)
 
+    # Decide whether this run is worth an email ("when needed"). Dashboard is
+    # published every run regardless; only the email is gated.
+    level = str(cfg.get("notify_level", "high_confidence")).lower()
+    if level == "always":
+        should_send = True
+    elif level == "any_activity":
+        should_send = len(scored) > 0
+    else:  # "high_confidence" (default)
+        should_send = top_pick is not None
+    fc.write_send_flag(SLUG, should_send)
+
     updated = fc.now_et_str()
     is_proxy = str(cfg.get("data_source", "yfinance")).lower() == "yfinance"
     dashboard = render_dashboard(board, top_pick, play, sentiment, provider,
@@ -359,10 +370,11 @@ def run():
         "contracts_scanned": len(scored), "qualified": len(qualified),
         "top_pick": (f'{top_pick["symbol"]} {top_pick["strike"]}{top_pick["type"][0].upper()} '
                      f'{top_pick["expiry"]}' if top_pick else None),
-        "error": error,
+        "error": error, "notify_level": level, "emailed": should_send,
     })
     n = f"{len(qualified)} qualified of {len(scored)}"
-    print(f"Marcus done. {n}. Subject: {subject}")
+    print(f"Marcus done. {n}. Email: {'yes' if should_send else 'no (nothing needed)'}. "
+          f"Subject: {subject}")
 
 
 # ─── RENDERING ────────────────────────────────────────────────────────────────

@@ -89,6 +89,17 @@ def run():
     # ── Persist the daily My Picks snapshot for Elena ──
     fc.snapshot_my_picks(my_book, bench_px)
 
+    # ── Decide whether this run is worth an email ("when needed") ──
+    # The dashboard is published every run regardless; only the email is gated.
+    level = str(cfg.get("notify_level", "alert")).lower()
+    if level == "always":
+        should_send = True
+    elif level == "watch":
+        should_send = (n_alert + n_watch) > 0
+    else:  # "alert" (default)
+        should_send = n_alert > 0
+    fc.write_send_flag(SLUG, should_send)
+
     updated = fc.now_et_str()
     dashboard = render_dashboard(checklist, reviewed, my_book, momentum_book,
                                  mom_dd, n_alert, n_watch, updated)
@@ -100,8 +111,10 @@ def run():
         "alerts": n_alert, "watches": n_watch,
         "momentum_drawdown_pct": mom_dd,
         "items": [f'{c["level"]}:{c["symbol"]}:{c["code"]}' for c in checklist],
+        "notify_level": level, "emailed": should_send,
     })
-    print(f"Sarah done. {n_alert} alerts, {n_watch} watches. Subject: {subject}")
+    print(f"Sarah done. {n_alert} alerts, {n_watch} watches. "
+          f"Email: {'yes' if should_send else 'no (nothing needed)'}. Subject: {subject}")
 
 
 # ─── RENDERING ────────────────────────────────────────────────────────────────

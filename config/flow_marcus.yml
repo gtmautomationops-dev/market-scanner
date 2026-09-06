@@ -57,3 +57,10 @@ min_vol_oi_ratio: 1.5            # volume >= 1.5x open interest → likely NEW p
 min_notional: 250000            # premium at risk today = volume * price * 100
 
 top_n: 15                        # how many unusual contracts to list on the board
+
+# When should Marcus actually EMAIL you? The dashboard updates every run no matter
+# what — this only gates the email, so you hear from him "when needed".
+#   high_confidence : only when a setup clears ALL criteria  (default)
+#   any_activity    : email whenever any unusual contracts show up
+#   always          : email every run
+notify_level: high_confidence

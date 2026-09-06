@@ -37,11 +37,19 @@ jobs:
           FLOW_API_KEY: ${{ secrets.FLOW_API_KEY }}
         run: python scripts/flow_marcus.py
 
+      # Marcus emails "when needed" — the script writes flow_marcus.send=true only
+      # when a setup clears his criteria (see notify_level in the config).
+      - name: Should Marcus email?
+        id: gate
+        run: echo "send=$(cat flow_marcus.send 2>/dev/null || echo false)" >> $GITHUB_OUTPUT
+
       - name: Read email subject
+        if: steps.gate.outputs.send == 'true'
         id: subject
         run: echo "subject=$(cat docs/flow_marcus_email_subject.txt)" >> $GITHUB_OUTPUT
 
       - name: Send flow email
+        if: steps.gate.outputs.send == 'true'
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com

@@ -12,3 +12,10 @@ stale_flat_band: 5      #   ...flagged if it's within ±this % of flat (dead mon
 
 concentration_pct: 25   # "watch" any single name that's this % of total exposure
 drawdown_alert_pct: 10  # "alert" when the Momentum book is this far off its peak
+
+# When should Sarah actually EMAIL you? The dashboard updates every run no matter
+# what — this only gates the email, so you hear from her "when needed".
+#   alert  : only when there's at least one act-now alert   (default)
+#   watch  : email if there are any alerts OR watch items
+#   always : email every run
+notify_level: alert
