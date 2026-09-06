@@ -1,0 +1,72 @@
+name: Elena - Weekly Report
+
+on:
+  schedule:
+    # 4:30 PM ET Friday (20:30 UTC) - after the week's close
+    - cron: '30 20 * * 5'
+  workflow_dispatch: # manual trigger
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+# Shares data/hedge_fund.db with Sarah — serialize on the same group.
+concurrency:
+  group: hedge-fund-book
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Elena (weekly report)
+        run: python scripts/report_elena.py
+
+      - name: Commit snapshot and report
+        run: |
+          git config user.name "elena-report-bot"
+          git config user.email "actions@github.com"
+          git add data/hedge_fund.db data/report_elena_runlog.json \
+                  docs/report_elena.html docs/report_elena_email.html docs/report_elena_email_subject.txt
+          git diff --cached --quiet || git commit -m "Elena weekly report $(date -u +%Y-%m-%dT%H:%M)"
+          git pull --rebase origin main
+          git push origin main
+
+      - name: Read email subject
+        id: subject
+        run: echo "subject=$(cat docs/report_elena_email_subject.txt)" >> $GITHUB_OUTPUT
+
+      - name: Send weekly report email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USERNAME }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: ${{ steps.subject.outputs.subject }}
+          to: gtmautomation.ops@gmail.com
+          from: Elena the Reporter <${{ secrets.GMAIL_USERNAME }}>
+          html_body: file://docs/report_elena_email.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          publish_branch: gh-pages
+          keep_files: true

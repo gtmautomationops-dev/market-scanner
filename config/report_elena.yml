@@ -1,0 +1,11 @@
+# Elena — the reporter. Writes the weekly performance report.
+#
+# Elena combines both books (My Picks + Momentum) into one weekly picture:
+# combined P&L, return on capital deployed, this week's change, a per-book
+# breakdown, and the biggest contributors and detractors.
+
+top_movers: 5   # how many winners and losers to list
+
+# Benchmark for the buy-and-hold comparison (My Picks benchmark in
+# config/my_picks.yml is used for its own relative math; this is the report's).
+benchmark: SPY

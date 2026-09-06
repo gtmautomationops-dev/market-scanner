@@ -1,0 +1,14 @@
+# Sarah — the risk manager. Checks open positions before the close.
+#
+# Sarah applies these thresholds to every open position across BOTH books
+# (My Picks + Momentum) and ranks what she finds into a pre-close checklist.
+# All percentages are whole numbers (3 = 3%).
+
+near_stop_pct: 3        # "watch" when price is within this % above a stop
+near_target_pct: 3      # "watch" when price is within this % below a target
+loss_alert_pct: 12      # "alert" when a position is down at least this much
+stale_days: 30          # a position held this long that's gone nowhere is...
+stale_flat_band: 5      #   ...flagged if it's within ±this % of flat (dead money)
+
+concentration_pct: 25   # "watch" any single name that's this % of total exposure
+drawdown_alert_pct: 10  # "alert" when the Momentum book is this far off its peak
