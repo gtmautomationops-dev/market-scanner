@@ -1,0 +1,45 @@
+# My Picks — the book YOU control.
+#
+# This is the one file the hedge-fund agents (Alex, Sarah, Elena) read but never
+# write. It's advisory: record the trades you actually made (or want to track on
+# paper). The agents mark these to market, risk-check them, and report on them.
+#
+# HOW TO USE
+#   • Bought something?  Add a lot under `holdings:` below.
+#   • Sold it?           Move that lot to `closed:` and add exit_price + exit_date.
+#   • Changed your mind on risk?  Edit `stop` / `target` any time.
+#
+# Fields per lot:
+#   symbol       (required)  e.g. NVDA, RY.TO   — Yahoo Finance ticker
+#   shares       (required)  number of shares
+#   entry_price  (required)  your average cost per share
+#   entry_date   (optional)  YYYY-MM-DD — lets Sarah flag "dead money" and Elena date things
+#   stop         (optional)  Sarah alerts when price breaches or nears it
+#   target       (optional)  Sarah flags when price reaches or nears it
+#   note         (optional)  your one-line thesis
+
+# Benchmark the agents measure you against (buy-and-hold yardstick).
+benchmark: SPY
+
+# ── Open positions ──
+# Start empty. Add your real lots here. Example of the shape (delete or replace):
+#
+#   - symbol: NVDA
+#     shares: 10
+#     entry_price: 118.40
+#     entry_date: 2026-08-15
+#     stop: 104.00
+#     target: 165.00
+#     note: "AI compute leader — riding the datacenter buildout"
+#
+holdings: []
+
+# ── Closed positions ── (feeds realized P&L in Sarah + Elena)
+#   - symbol: AAPL
+#     shares: 20
+#     entry_price: 182.00
+#     entry_date: 2026-06-01
+#     exit_price: 209.50
+#     exit_date: 2026-07-20
+#
+closed: []

@@ -1,0 +1,20 @@
+# Alex — the analyst. Scans the market for promising stocks & ETFs.
+#
+# Alex ranks the whole scanner universe with the same transparent momentum engine
+# the paper trader uses, then publishes the top ideas he doesn't already see in
+# your books. He never trades — this is a watchlist.
+
+top_n: 12          # how many fresh ideas to surface
+min_score: 4.0     # only pitch names scoring at least this on the momentum engine
+
+# Universe (mirrors the ticker lists in scripts/scanner.py)
+include_etfs: true
+include_canada: true
+exclude_leveraged: true   # skip daily-reset leveraged/decay ETFs
+
+# Buy-and-hold yardstick used for the relative-strength factor.
+benchmark: SPY
+
+# Shape of the suggested entry/stop/target plan Alex prints next to each idea.
+plan_stop_pct: 0.08   # floor for the ATR-based initial stop
+plan_target_r: 2.5    # profit target as a multiple of initial risk (R)

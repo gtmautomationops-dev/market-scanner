@@ -1,0 +1,66 @@
+# Marcus — the flow trader. Scans options activity for big, aggressive trades.
+#
+# Modeled on the WSJ "Codex options-flow" agent: sift option activity, score it
+# for size and aggression, surface the single highest-confidence setup — then show
+# a DEFINED-RISK way to express it. Advisory only: Marcus never fires an order.
+#
+# ── DATA SOURCE (phased) ──────────────────────────────────────────────────────
+#   yfinance : FREE, delayed end-of-day OPTION-CHAIN snapshots. Marcus scores
+#              classic "unusual activity" — volume vs open interest, premium
+#              notional, days-to-expiry, moneyness. This is a PROXY: chain data
+#              cannot see sweeps, blocks, or which side hit the bid/ask, so it
+#              cannot truly identify institutional flow. It is clearly labeled as
+#              such everywhere it prints.
+#   polygon / unusual_whales : the REAL thing (sweeps, blocks, aggressor side).
+#              Not wired yet — drop-in provider slots exist in
+#              scripts/flow_marcus.py behind the same interface. Set the source
+#              here and put the key in the env var named by api_key_env.
+data_source: yfinance
+api_key_env: FLOW_API_KEY        # only used by paid providers
+
+# Liquid, optionable names whose chains Marcus scans. Illiquid chains are slow
+# and noisy — keep this list to names with real options volume.
+symbols:
+  - NVDA
+  - AAPL
+  - MSFT
+  - AMZN
+  - META
+  - GOOGL
+  - TSLA
+  - AMD
+  - MU
+  - AVGO
+  - SMCI
+  - PLTR
+  - NFLX
+  - COIN
+  - MSTR
+  - QCOM
+  - MRVL
+  - ARM
+  - SPY
+  - QQQ
+  - IWM
+include_holdings: true           # also scan names you hold in either book
+
+# Which contracts to consider.
+min_dte: 3                       # skip 0–2 DTE lottery tickets
+max_dte: 60                      # and anything too far out to be "momentum"
+expiries_per_symbol: 4           # nearest N expiries inside the DTE band
+min_contract_volume: 100         # ignore contracts thinner than this before scoring
+
+# High-confidence criteria — a contract must clear ALL of these to be promoted to
+# Marcus's single "high-confidence trade" (his re-check, like the article's agent).
+min_volume: 500                  # contracts traded today
+min_vol_oi_ratio: 1.5            # volume >= 1.5x open interest → likely NEW positioning
+min_notional: 250000            # premium at risk today = volume * price * 100
+
+top_n: 15                        # how many unusual contracts to list on the board
+
+# When should Marcus actually EMAIL you? The dashboard updates every run no matter
+# what — this only gates the email, so you hear from him "when needed".
+#   high_confidence : only when a setup clears ALL criteria  (default)
+#   any_activity    : email whenever any unusual contracts show up
+#   always          : email every run
+notify_level: high_confidence

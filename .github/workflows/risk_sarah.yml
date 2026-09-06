@@ -1,0 +1,81 @@
+name: Sarah - Risk (Pre-Close Check)
+
+on:
+  schedule:
+    # 3:45 PM ET (19:45 UTC) - before the close, weekdays
+    - cron: '45 19 * * 1-5'
+  workflow_dispatch: # manual trigger
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+# Sarah and Elena both write data/hedge_fund.db — serialize them so two runs
+# never commit the snapshot ledger at once.
+concurrency:
+  group: hedge-fund-book
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Sarah (risk)
+        run: python scripts/risk_sarah.py
+
+      - name: Commit snapshot and dashboard
+        run: |
+          git config user.name "sarah-risk-bot"
+          git config user.email "actions@github.com"
+          git add data/hedge_fund.db data/risk_sarah_runlog.json \
+                  docs/risk_sarah.html docs/risk_sarah_email.html docs/risk_sarah_email_subject.txt
+          git diff --cached --quiet || git commit -m "Sarah pre-close check $(date -u +%Y-%m-%dT%H:%M)"
+          git pull --rebase origin main
+          git push origin main
+
+      # Sarah emails "when needed" — the script writes risk_sarah.send=true only
+      # when there's something worth your attention (see notify_level in the config).
+      - name: Should Sarah email?
+        id: gate
+        run: echo "send=$(cat risk_sarah.send 2>/dev/null || echo false)" >> $GITHUB_OUTPUT
+
+      - name: Read email subject
+        if: steps.gate.outputs.send == 'true'
+        id: subject
+        run: echo "subject=$(cat docs/risk_sarah_email_subject.txt)" >> $GITHUB_OUTPUT
+
+      - name: Send risk email
+        if: steps.gate.outputs.send == 'true'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USERNAME }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: ${{ steps.subject.outputs.subject }}
+          to: gtmautomation.ops@gmail.com
+          from: Sarah the Risk Manager <${{ secrets.GMAIL_USERNAME }}>
+          html_body: file://docs/risk_sarah_email.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          publish_branch: gh-pages
+          keep_files: true

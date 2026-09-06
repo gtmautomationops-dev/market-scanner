@@ -1,0 +1,62 @@
+name: Alex - Analyst (Watchlist)
+
+on:
+  schedule:
+    # 9:40 AM ET (13:40 UTC) - shortly after market open
+    - cron: '40 13 * * 1-5'
+    # 4:10 PM ET (20:10 UTC) - shortly after market close
+    - cron: '10 20 * * 1-5'
+  workflow_dispatch: # manual trigger
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Alex is stateless — he recomputes from public prices + the ledgers already
+      # on main each run, so there is nothing to commit back. Publish and email.
+      - name: Run Alex (analyst)
+        run: python scripts/analyst_alex.py
+
+      - name: Read email subject
+        id: subject
+        run: echo "subject=$(cat docs/analyst_alex_email_subject.txt)" >> $GITHUB_OUTPUT
+
+      - name: Send watchlist email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USERNAME }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: ${{ steps.subject.outputs.subject }}
+          to: gtmautomation.ops@gmail.com
+          from: Alex the Analyst <${{ secrets.GMAIL_USERNAME }}>
+          html_body: file://docs/analyst_alex_email.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          publish_branch: gh-pages
+          # Additive publish: never delete pages this workflow didn't generate.
+          keep_files: true
