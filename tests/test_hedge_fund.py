@@ -17,6 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
 import fund_common as fc
 import report_elena as elena
+import flow_marcus as flow
 
 
 def _prices(**last):
@@ -176,6 +177,93 @@ def test_week_delta_uses_seven_day_lookback():
 
 def test_week_delta_empty():
     assert elena._week_delta([]) == (0.0, None)
+
+
+# ─── Marcus's options-flow logic ───────────────────────────────────────────────
+
+FLOW_CFG = {"min_volume": 500, "min_vol_oi_ratio": 1.5, "min_notional": 250000,
+            "min_dte": 3, "max_dte": 60}
+
+
+def _mk(typ="call", spot=100.0, strike=105.0, dte=14, last=3.0, ask=3.0,
+        volume=3000, oi=500):
+    return flow._contract(symbol="X", spot=spot, typ=typ, strike=strike, expiry="2026-09-20",
+                          dte=dte, last=last, bid=last - 0.1, ask=ask, volume=volume,
+                          open_interest=oi, iv=0.5)
+
+
+def test_contract_notional_and_vol_oi():
+    c = _mk(volume=3000, oi=500, ask=3.0)
+    assert c["notional"] == 3000 * 3.0 * 100          # 900,000
+    assert c["vol_oi"] == 6.0
+    # Zero OI -> infinite vol/OI (brand-new positioning).
+    assert _mk(oi=0)["vol_oi"] == float("inf")
+
+
+def test_contract_moneyness_sign():
+    call_otm = _mk("call", spot=100, strike=110)["otm"]   # +10% OTM
+    put_otm = _mk("put", spot=100, strike=90)["otm"]      # +10% OTM
+    assert round(call_otm, 3) == 0.1
+    assert round(put_otm, 3) == 0.1
+    assert _mk("call", spot=100, strike=90)["otm"] < 0    # ITM call
+
+
+def test_score_rewards_fresh_aggressive_prints():
+    aggressive = _mk(volume=6000, oi=300, ask=5.0, dte=14, strike=105)  # 5x OI, $3M
+    tame = _mk(volume=600, oi=4000, ask=0.5, dte=14, strike=105)        # below OI, small
+    sa, _ = flow.score_contract(aggressive)
+    st, _ = flow.score_contract(tame)
+    assert sa > st
+    assert sa > 0
+
+
+def test_passes_criteria_gate():
+    good = _mk(volume=3000, oi=500, ask=3.0, dte=14)   # 900K notional, 6x OI
+    assert flow.passes_criteria(good, FLOW_CFG)
+    thin = _mk(volume=300, oi=500, ask=3.0, dte=14)    # below min_volume
+    assert not flow.passes_criteria(thin, FLOW_CFG)
+    closing = _mk(volume=3000, oi=5000, ask=3.0)       # vol/OI 0.6 < 1.5
+    assert not flow.passes_criteria(closing, FLOW_CFG)
+    far = _mk(volume=3000, oi=500, ask=3.0, dte=200)   # outside DTE band
+    assert not flow.passes_criteria(far, FLOW_CFG)
+
+
+def test_defined_risk_play_caps_loss():
+    call = _mk("call", spot=100, strike=105, ask=3.0)
+    play = flow.defined_risk_play(call)
+    assert play["max_loss"] == play["debit_per_contract"] == 300.0  # 3.0 * 100
+    assert play["breakeven"] == 108.0                                # 105 + 3
+    put = flow.defined_risk_play(_mk("put", spot=100, strike=95, ask=2.0))
+    assert put["breakeven"] == 93.0                                  # 95 - 2
+
+
+def test_flow_sentiment_tilt():
+    contracts = [
+        flow._contract("AAA", 100, "call", 105, "2026-09-20", 14, 4, 3.9, 4.0, 5000, 100, 0.5),
+        flow._contract("AAA", 100, "put", 95, "2026-09-20", 14, 1, 0.9, 1.0, 200, 100, 0.5),
+    ]
+    s = flow.flow_sentiment(contracts)[0]
+    assert s["symbol"] == "AAA"
+    assert s["tilt"] == "bullish"        # call premium dwarfs put premium
+    assert s["call_pct"] >= 65
+
+
+def test_get_provider_selection():
+    assert isinstance(flow.get_provider({"data_source": "yfinance"}), flow.YFinanceProvider)
+    # Paid providers resolve but their fetch is a not-yet-wired stub.
+    poly = flow.get_provider({"data_source": "polygon"})
+    assert isinstance(poly, flow.PolygonProvider)
+    try:
+        poly.unusual_contracts(["NVDA"], {})
+        assert False, "expected NotImplementedError"
+    except NotImplementedError:
+        pass
+    # Unknown source is a hard error, not a silent default.
+    try:
+        flow.get_provider({"data_source": "bogus"})
+        assert False, "expected ValueError"
+    except ValueError:
+        pass
 
 
 if __name__ == "__main__":

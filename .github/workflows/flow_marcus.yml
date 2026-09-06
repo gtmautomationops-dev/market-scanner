@@ -1,0 +1,63 @@
+name: Marcus - Flow (Options Activity)
+
+on:
+  schedule:
+    # 4:15 PM ET (20:15 UTC) - after the close, when EOD chains are complete
+    - cron: '15 20 * * 1-5'
+  workflow_dispatch: # manual trigger
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  flow:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Marcus is stateless — he recomputes from option chains each run, so there
+      # is nothing to commit back. Publish and email.
+      - name: Run Marcus (options flow)
+        # Paid providers read their key from the env var named in config
+        # (flow_marcus.yml: api_key_env). Harmless/empty on the free yfinance path.
+        env:
+          FLOW_API_KEY: ${{ secrets.FLOW_API_KEY }}
+        run: python scripts/flow_marcus.py
+
+      - name: Read email subject
+        id: subject
+        run: echo "subject=$(cat docs/flow_marcus_email_subject.txt)" >> $GITHUB_OUTPUT
+
+      - name: Send flow email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USERNAME }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: ${{ steps.subject.outputs.subject }}
+          to: gtmautomation.ops@gmail.com
+          from: Marcus the Flow Trader <${{ secrets.GMAIL_USERNAME }}>
+          html_body: file://docs/flow_marcus_email.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          publish_branch: gh-pages
+          keep_files: true

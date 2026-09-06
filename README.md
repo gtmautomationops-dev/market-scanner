@@ -116,6 +116,22 @@ They watch **two books**:
 | **Alex** (`scripts/analyst_alex.py`) | Scans the market for promising stocks/ETFs and publishes a ranked watchlist with a thesis + entry/stop/target per idea. Skips names you already own; flags held names whose momentum is fading. | Open & close (9:40 AM / 4:10 PM ET) | `analyst_alex.html` + email |
 | **Sarah** (`scripts/risk_sarah.py`) | Checks every open position in both books before the close and ranks a pre-close checklist: stops breached/near, targets hit/near, outsized losses, dead money, single-name concentration, book drawdown. Snapshots the My Picks book daily. | Pre-close (3:45 PM ET, weekdays) | `risk_sarah.html` + email |
 | **Elena** (`scripts/report_elena.py`) | Writes the weekly performance report: combined P&L and return on capital vs SPY, this week's change, a per-book breakdown, and the biggest contributors and detractors. | Weekly (Fri 4:30 PM ET) | `report_elena.html` + email |
+| **Marcus** (`scripts/flow_marcus.py`) | Scans options activity for big, aggressive trades, scores them, and surfaces the single highest-confidence setup with a **defined-risk** structure. Advisory. | Post-close (4:15 PM ET) | `flow_marcus.html` + email |
+
+### Marcus & the options-flow data (read this)
+
+Marcus is modeled on the WSJ "Codex options-flow" agent, but he is honest about
+his data. On the default **`yfinance`** source he reads delayed, end-of-day
+option-**chain** snapshots and scores the classic *unusual activity* tells —
+volume vs open interest, premium notional, days-to-expiry, moneyness. A chain
+**cannot** show sweeps, blocks, or which side hit the bid/ask, so this is a
+labeled **proxy**, not true institutional flow. Real flow needs a paid feed
+(Polygon.io, Unusual Whales); drop-in provider slots exist in
+`scripts/flow_marcus.py` behind a `FlowProvider` interface — set `data_source`
+in `config/flow_marcus.yml` and supply the key via the `FLOW_API_KEY` secret.
+
+Marcus is advisory and every suggestion is framed as **defined risk**: a long
+option can lose 100% of its premium. He never places an order.
 
 Shared plumbing lives in `scripts/fund_common.py` (config/holdings loading, price
 fetching, marking each book to market, Sarah's risk rules, the daily snapshot in

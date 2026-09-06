@@ -406,9 +406,10 @@ def my_picks_curve():
 # ─── SHARED DASHBOARD CHROME ──────────────────────────────────────────────────
 
 AGENTS = [
-    ("Alex",  "analyst_alex.html",   "Analyst"),
-    ("Sarah", "risk_sarah.html",     "Risk"),
-    ("Elena", "report_elena.html",   "Report"),
+    ("Alex",   "analyst_alex.html",   "Analyst"),
+    ("Sarah",  "risk_sarah.html",     "Risk"),
+    ("Elena",  "report_elena.html",   "Report"),
+    ("Marcus", "flow_marcus.html",    "Flow"),
 ]
 OTHER_LINKS = [
     ("Momentum", "momentum_trader.html"),
