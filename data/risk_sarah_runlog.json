@@ -1,0 +1,15 @@
+{
+  "run_at": "2026-09-07T22:16:59.489540+00:00",
+  "positions_reviewed": 3,
+  "alerts": 0,
+  "watches": 4,
+  "momentum_drawdown_pct": -9.63,
+  "items": [
+    "watch:ABBV:stale",
+    "watch:ABBV:concentration",
+    "watch:ABNB:concentration",
+    "watch:POW.TO:stale"
+  ],
+  "notify_level": "alert",
+  "emailed": false
+}
