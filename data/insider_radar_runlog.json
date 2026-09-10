@@ -1,12 +1,12 @@
 {
-  "run_at": "2026-09-10T16:57:51.943995+00:00",
+  "run_at": "2026-09-10T19:31:40.370808+00:00",
   "mode": "firehose",
   "offering_purchases_flagged": 259,
   "first_run": false,
   "since": "2026-09-08",
   "form4_in_window": 2147,
-  "stored": 247,
-  "skipped_duplicate": 784,
+  "stored": 11,
+  "skipped_duplicate": 1020,
   "skipped_no_open_market_txn": 1116,
   "pruned_old": 0,
   "classified": [
@@ -1530,27 +1530,6 @@
       ]
     },
     {
-      "accession": "0001437749-26-029874",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "small buy $10,072"
-      ]
-    },
-    {
-      "accession": "0001628280-26-060955",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "sell $25,492 below caution threshold"
-      ]
-    },
-    {
-      "accession": "0001174947-26-000849",
-      "signal": "CAUTION",
-      "reasons": [
-        "stake reduced 100%"
-      ]
-    },
-    {
       "accession": "0001628280-26-061139",
       "signal": "NEUTRAL",
       "reasons": [
@@ -2164,13 +2143,6 @@
       "signal": "NEUTRAL",
       "reasons": [
         "sell $303,285 below caution threshold"
-      ]
-    },
-    {
-      "accession": "0001140361-26-036091",
-      "signal": "STRONG BULLISH",
-      "reasons": [
-        "cluster buy: 3 insiders in 30d"
       ]
     },
     {
@@ -2811,13 +2783,6 @@
       ]
     },
     {
-      "accession": "0001796825-26-000016",
-      "signal": "NEUTRAL",
-      "reasons": [
-        "10b5-1 planned trade"
-      ]
-    },
-    {
       "accession": "0001435109-26-000142",
       "signal": "STRONG BULLISH",
       "reasons": [
@@ -3221,6 +3186,41 @@
       "signal": "NEUTRAL",
       "reasons": [
         "sell $6,741 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001437749-26-029874",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "small buy $10,072"
+      ]
+    },
+    {
+      "accession": "0001628280-26-060955",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "sell $25,492 below caution threshold"
+      ]
+    },
+    {
+      "accession": "0001174947-26-000849",
+      "signal": "CAUTION",
+      "reasons": [
+        "stake reduced 100%"
+      ]
+    },
+    {
+      "accession": "0001140361-26-036091",
+      "signal": "STRONG BULLISH",
+      "reasons": [
+        "cluster buy: 3 insiders in 30d"
+      ]
+    },
+    {
+      "accession": "0001796825-26-000016",
+      "signal": "NEUTRAL",
+      "reasons": [
+        "10b5-1 planned trade"
       ]
     }
   ],
