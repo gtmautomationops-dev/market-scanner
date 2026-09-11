@@ -1,9 +1,9 @@
 {
-  "run_at": "2026-09-10T21:55:57.304339+00:00",
+  "run_at": "2026-09-11T21:59:04.674205+00:00",
   "positions_reviewed": 3,
   "alerts": 1,
   "watches": 4,
-  "momentum_drawdown_pct": -12.16,
+  "momentum_drawdown_pct": -11.91,
   "items": [
     "alert:FUND:drawdown",
     "watch:ABBV:stale",
