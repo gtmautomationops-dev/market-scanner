@@ -1,0 +1,47 @@
+# Houston — mission control. The coordinator that sits above the other desks.
+#
+# Houston does not trade and does not run a book of its own. Once a day it marks
+# both books to market, ranks the ETF universe with the same momentum engine the
+# rest of the fund uses, applies Sarah's risk rules across every open position,
+# and pulls in each desk's latest FILED report (from the runlogs committed to
+# main) so you get one unified read instead of eight separate emails.
+#
+# The lens leads with ETFs — Houston highlights the ETF picture first — but the
+# synthesis covers the whole fund. All percentages are whole numbers (3 = 3%).
+
+# ── ETF lens ──────────────────────────────────────────────────────────────────
+etf_top_n: 10          # how many ETFs to show on the ETF leaderboard
+etf_idea_n: 4          # how many fresh (unheld) ETF ideas to plan out up top
+min_score: 4.0         # only surface ETF ideas scoring at least this
+include_canada: true   # include TSX-listed ETFs (.TO) in the ETF universe
+exclude_leveraged: true  # skip daily-reset leveraged/decay ETFs
+include_bond_etfs: true  # include bond ETFs in the ranked universe
+
+# Buy-and-hold yardstick for the relative-strength factor and P&L-vs-market.
+benchmark: SPY
+
+# Shape of the suggested entry/stop/target plan printed next to each ETF idea.
+plan_stop_pct: 0.08    # floor for the ATR-based initial stop
+plan_target_r: 2.5     # profit target as a multiple of initial risk (R)
+
+# ── Risk rules Houston reuses (same knobs as Sarah) ───────────────────────────
+near_stop_pct: 3
+near_target_pct: 3
+loss_alert_pct: 12
+stale_days: 30
+stale_flat_band: 5
+concentration_pct: 25
+drawdown_alert_pct: 10
+
+# ── Desk roll-call: how fresh is "fresh"? ─────────────────────────────────────
+# Houston reads each desk's latest committed runlog. A report older than this is
+# labelled "stale" on the roll-call so you always know what you're looking at —
+# Houston never presents an old report as if it were live.
+stale_report_hours: 48
+
+# ── When should Houston actually EMAIL the daily brief? ───────────────────────
+# The dashboard is published every run no matter what — this only gates the email.
+#   alert  : email only when Houston sees at least one fund-wide act-now alert
+#   watch  : email when there are any alerts OR watch items across the fund
+#   always : email the brief every run (a true daily mission-control digest)
+notify_level: watch

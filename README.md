@@ -146,6 +146,44 @@ address as the rest of the repo.
 
 Tests for the marking, risk-flag, and report math: `python tests/test_hedge_fund.py`.
 
+## Houston — Mission Control (the coordinator)
+
+Every agent above runs its own narrow beat. **Houston** is the layer that sits
+*above* them — the "mission control" from the hedge-fund-run-by-AI story, where
+every desk reports in and one unified read comes out, so you can glance at a
+single page instead of eight separate emails.
+
+Houston **does not trade** and keeps no book of its own. Once a day, after the
+close (4:45 PM ET), it:
+
+1. **Marks both books** (My Picks + Momentum) to market with live prices.
+2. **Ranks the ETF universe** with the same transparent momentum engine the rest
+   of the fund uses, and plans out the top fresh (unheld) ETF ideas — the lens
+   **leads with ETFs**, then covers the whole fund.
+3. **Applies Sarah's exact risk rules** across every open position and rolls them
+   into one fund-wide checklist (ETF holdings tagged).
+4. **Reads each desk's last filed report** — the runlogs committed to `main` by
+   Sarah, the Momentum trader, Elena, and the Congress / Insider trackers — and
+   puts them on a single **roll-call**, each stamped with how old it is. A report
+   older than `stale_report_hours` is labelled **stale**, so Houston never
+   presents an old report as if it were live. (Alex and Marcus are stateless —
+   they file nothing to `main` — so they aren't on the roll-call; Houston covers
+   the ETF slice of Alex's watchlist itself, and every page links to the rest.)
+
+| Agent | Role | Runs | Output |
+|-------|------|------|--------|
+| **Houston** (`scripts/houston.py`) | Coordinates every desk into one ETF-led daily brief: combined P&L, ETF leaderboard + ideas, fund-wide risk, and a roll-call of each desk's latest report with staleness. Advisory — never trades. | Post-close (4:45 PM ET, weekdays) | `houston.html` + email |
+
+**Email gating** (edit `config/houston.yml`): like the other agents, the
+dashboard publishes every run and only the email is gated by `notify_level` —
+`alert` (fund alerts only), `watch` (alerts *or* watch items, the default), or
+`always` (a true daily digest every run). Tune the ETF lens (`etf_top_n`,
+`min_score`, `include_bond_etfs`, …) and the risk thresholds in the same file;
+the risk knobs mirror Sarah's.
+
+Tests for the ETF ranking, risk roll-up, and roll-call/staleness logic (all
+offline): `python tests/test_houston.py`.
+
 ## Not Financial Advice
 
 This tool generates algorithmic signals based on price action and momentum. The

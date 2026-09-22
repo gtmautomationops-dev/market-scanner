@@ -1,0 +1,70 @@
+name: Houston - Mission Control (Daily Brief)
+
+on:
+  schedule:
+    # 4:45 PM ET (20:45 UTC) - after the close, once every desk has filed the
+    # day's report (Sarah pre-close 3:45, the close paper run, Marcus 4:15).
+    - cron: '45 20 * * 1-5'
+  workflow_dispatch: # manual trigger
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  coordinate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Houston is stateless — it recomputes the live picture from public prices
+      # and reads the desk runlogs already on main, so there is nothing to commit
+      # back. It synthesizes, publishes, and (when needed) emails one daily brief.
+      - name: Run Houston (mission control)
+        run: python scripts/houston.py
+
+      # Houston emails "when needed" — the script writes houston.send=true only
+      # when the fund has something worth a look (see notify_level in the config).
+      - name: Should Houston email?
+        id: gate
+        run: echo "send=$(cat houston.send 2>/dev/null || echo false)" >> $GITHUB_OUTPUT
+
+      - name: Read email subject
+        if: steps.gate.outputs.send == 'true'
+        id: subject
+        run: echo "subject=$(cat docs/houston_email_subject.txt)" >> $GITHUB_OUTPUT
+
+      - name: Send daily brief email
+        if: steps.gate.outputs.send == 'true'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USERNAME }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: ${{ steps.subject.outputs.subject }}
+          to: gtmautomation.ops@gmail.com
+          from: Houston Mission Control <${{ secrets.GMAIL_USERNAME }}>
+          html_body: file://docs/houston_email.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          publish_branch: gh-pages
+          # Additive publish: never delete pages this workflow didn't generate.
+          keep_files: true

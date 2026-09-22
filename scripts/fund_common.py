@@ -406,6 +406,7 @@ def my_picks_curve():
 # ─── SHARED DASHBOARD CHROME ──────────────────────────────────────────────────
 
 AGENTS = [
+    ("Houston", "houston.html",        "Mission Control"),
     ("Alex",   "analyst_alex.html",   "Analyst"),
     ("Sarah",  "risk_sarah.html",     "Risk"),
     ("Elena",  "report_elena.html",   "Report"),
