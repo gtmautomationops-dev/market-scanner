@@ -1,0 +1,17 @@
+{
+  "fps": 30,
+  "transition": 15,
+  "finaleHit": 270,
+  "scenes": [
+    { "id": "Open", "frames": 240 },
+    { "id": "Greece", "frames": 420 },
+    { "id": "Rome", "frames": 330 },
+    { "id": "Printing", "frames": 360 },
+    { "id": "Science", "frames": 420 },
+    { "id": "Enlightenment", "frames": 240 },
+    { "id": "Machine", "frames": 360 },
+    { "id": "Information", "frames": 420 },
+    { "id": "Kardashev", "frames": 510 },
+    { "id": "Finale", "frames": 435 }
+  ]
+}
