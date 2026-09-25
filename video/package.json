@@ -29,7 +29,7 @@
   "scripts": {
     "score": "node scripts/make-score.mjs",
     "dev": "npm run score && remotion studio",
-    "render": "npm run score && remotion render WesternCiv out/western-civ.mp4",
+    "video": "node scripts/video.mjs",
     "build": "remotion bundle",
     "upgrade": "remotion upgrade",
     "lint": "eslint src && tsc"

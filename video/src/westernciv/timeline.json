@@ -1,17 +1,17 @@
 {
   "fps": 30,
   "transition": 15,
-  "finaleHit": 270,
+  "hit": { "scene": "Finale", "frame": 270, "chord": "A" },
   "scenes": [
-    { "id": "Open", "frames": 240 },
-    { "id": "Greece", "frames": 420 },
-    { "id": "Rome", "frames": 330 },
-    { "id": "Printing", "frames": 360 },
-    { "id": "Science", "frames": 420 },
-    { "id": "Enlightenment", "frames": 240 },
-    { "id": "Machine", "frames": 360 },
-    { "id": "Information", "frames": 420 },
-    { "id": "Kardashev", "frames": 510 },
-    { "id": "Finale", "frames": 435 }
+    { "id": "Open", "frames": 240, "chord": "Am" },
+    { "id": "Greece", "frames": 420, "chord": "F" },
+    { "id": "Rome", "frames": 330, "chord": "C" },
+    { "id": "Printing", "frames": 360, "chord": "Am" },
+    { "id": "Science", "frames": 420, "chord": "G" },
+    { "id": "Enlightenment", "frames": 240, "chord": "Cbright" },
+    { "id": "Machine", "frames": 360, "chord": "Amwide", "bpm": 60 },
+    { "id": "Information", "frames": 420, "chord": "Fmaj7", "bpm": 90 },
+    { "id": "Kardashev", "frames": 510, "chord": "Dsus2", "bpm": 120 },
+    { "id": "Finale", "frames": 435, "chord": "E", "accelerate": true }
   ]
 }

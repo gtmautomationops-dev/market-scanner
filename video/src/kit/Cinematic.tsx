@@ -131,7 +131,7 @@ export const Vignette: React.FC<{ strength?: number }> = ({ strength = 0.75 }) =
   />
 );
 
-/** Centered line of display text that fades/unblurs in and out. */
+/** Centered line of display text that fades/unblurs in and out. `y` defaults to mid-frame. */
 export const CenterLine: React.FC<{
   text: React.ReactNode;
   start: number;
@@ -146,12 +146,13 @@ export const CenterLine: React.FC<{
   start,
   end,
   size = 64,
-  y = 540,
+  y,
   font = fonts.serif,
   color = colors.ink,
   weight = 400,
 }) => {
   const frame = useCurrentFrame();
+  const { height } = useVideoConfig();
   const p = progress(frame, start, 30);
   return (
     <div
@@ -159,7 +160,7 @@ export const CenterLine: React.FC<{
         position: "absolute",
         left: 120,
         right: 120,
-        top: y,
+        top: y ?? height / 2,
         translate: `0 ${-size / 2 + (1 - p) * 16}px`,
         textAlign: "center",
         fontFamily: font,

@@ -2,7 +2,7 @@ import timeline from "./timeline.json";
 
 export const FPS = timeline.fps;
 export const TRANSITION = timeline.transition;
-export const FINALE_HIT = timeline.finaleHit;
+export const FINALE_HIT = timeline.hit.frame;
 
 export type SceneId =
   | "Open"

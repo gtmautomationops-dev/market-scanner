@@ -1,75 +1,78 @@
 # Videos (Remotion + Claude Code)
 
-Motion-graphics videos written as React code by Claude Code and rendered to
-MP4 by [Remotion](https://www.remotion.dev). Nothing here touches the market
-scanner — it's a separate Node project.
+Cinematic motion-graphics videos, written as React code by Claude Code and
+rendered to MP4 by [Remotion](https://www.remotion.dev). This is a separate
+Node project; nothing here touches the market scanner.
 
-The Remotion agent skills live in `../.claude/skills/` (from
-[remotion-dev/skills](https://github.com/remotion-dev/skills)), so any Claude
-Code session opened in this repo knows Remotion's best practices.
+## Making a video
+
+Open Claude Code in this repo and describe what you want. The
+`make-video` skill (`../.claude/skills/make-video/`) walks Claude through
+brief → scenes → frame checks → render → a file small enough to send in chat.
+Remotion's own skills (`../.claude/skills/remotion-*`) cover the API.
+
+Briefs that work well name the **arc**, **length**, **format**, **style**,
+and **ending**:
+
+> Make a 90-second vertical video on the history of money, from barter to
+> Bitcoin. House style. One scene per era with a date/place kicker. End on
+> "SOVEREIGN".
 
 ## Commands
 
 ```console
-npm i              # once
-npm run dev        # Remotion Studio preview (generates the score first)
-npm run render     # -> out/western-civ.mp4 (1920x1080, 30fps, ~2 min)
-npm run lint       # eslint + tsc
+npm i                                      # once
+npm run dev                                # Remotion Studio preview
+npm run video -- <Id> --frames=0,90,300    # PNG previews in out/<Id>-frames/
+npm run video -- <Id>                      # out/<Id>.mp4 (+ out/<Id>-share.mp4 if > 28 MB)
+npm run lint                               # eslint + tsc
 ```
 
-Rendering the 2-minute video takes ~6 minutes on a 4-core cloud container.
+Rendering takes about 3 s per second of video on a 4-core cloud container.
 
-Render a few frames as PNGs to check a change without rendering everything:
+## Layout
 
-```console
-npx remotion render WesternCiv out/frames --frames=190,565,890 --image-format=png --scale=0.5
-```
-
-## Making a new video
-
-Open Claude Code in this repo and describe the video. Briefs that work well
-name the **arc**, the **length**, the **style**, and the **ending**:
-
-> Make a 90-second cinematic video tracing the history of money, from barter
-> to Bitcoin. Same style as WesternCiv (dark, gold, Cinzel titles, film
-> grain). One scene per era with a date/place kicker. End on the word
-> "SOVEREIGN". Reuse src/kit.
-
-Each video gets its own folder under `src/` (like `src/westernciv/`) and its
-own `<Composition>` in `src/Root.tsx`.
-
-## What's reusable
-
-`src/kit/` is the shared look:
-
-| File | What it gives you |
+| Path | What |
 | --- | --- |
-| `theme.ts` | Colours and bundled fonts (Cinzel titles, Inter body, Cormorant Garamond for maths/lowercase — Cinzel has no lowercase) |
-| `Cinematic.tsx` | `SceneFrame` (slow push-in), `TitleBlock` (kicker + headline + subline), `CenterLine`, `Starfield`, `FilmGrain`, `Vignette`, `drawProps()` for self-drawing SVG lines, timing helpers |
+| `src/kit/` | Shared look: colours, bundled fonts, `SceneFrame` (slow push-in), `TitleBlock`, `CenterLine`, `Starfield`, `FilmGrain`, `Vignette`, `drawProps()` for self-drawing SVG, timing helpers |
+| `src/<video>/` | One folder per video: `timeline.json`, `scenes/*.tsx`, the assembled video |
+| `src/westernciv/` | Worked example: 2 min, 10 scenes, Greek geometry → Dyson swarm → "ACCELERATE" |
+| `scripts/make-score.mjs` | Synthesizes an original soundtrack for every `src/*/timeline.json` |
+| `scripts/video.mjs` | The `npm run video` command |
 
-## How WesternCiv is put together
+### timeline.json
 
-- `src/westernciv/timeline.json` — scene order and lengths in frames. **Single
-  source of truth**: the video and the soundtrack both read it, so editing a
-  scene length keeps the music in sync.
-- `src/westernciv/scenes/*.tsx` — one file per scene. Each scene is also
-  registered on its own (`WesternCiv-Greece`, …) for previewing in Studio.
-- `scripts/make-score.mjs` — synthesizes an original soundtrack (chord pad
-  per era, accelerating pulse, riser, final hit on ACCELERATE) to
-  `public/westernciv-score.wav`. It's generated, not committed.
+Scene order and lengths in frames. The video and the soundtrack both read
+it, so changing a scene length keeps the music in sync.
 
-All visuals are drawn in code (SVG/CSS) — no stock images or footage — so
-there's nothing to license and nothing to download at render time.
+```json
+{
+  "fps": 30,
+  "transition": 15,
+  "hit": { "scene": "Finale", "frame": 270, "chord": "A" },
+  "scenes": [
+    { "id": "Open", "frames": 240, "chord": "Am" },
+    { "id": "Machine", "frames": 360, "chord": "Amwide", "bpm": 60 },
+    { "id": "Finale", "frames": 435, "chord": "E", "accelerate": true }
+  ]
+}
+```
+
+- `chord` — pad chord for the scene (list in `make-score.mjs`); defaults cycle Am F C G.
+- `bpm` — adds a heartbeat pulse during that scene.
+- `accelerate` — pulse speeds up with a rising noise sweep into the `hit`.
+- `hit` — optional boom and resolution chord at that frame of that scene.
+
+The generated `public/*-score.wav` files and everything in `out/` are
+git-ignored; only source is committed.
 
 ## Running in a Claude Code cloud session
 
-- The cloud sandbox can't download Remotion's own headless Chrome
-  (`remotion.media` is blocked), so `remotion.config.ts` uses the
-  pre-installed Chromium when it exists. Locally, Remotion downloads its own
-  browser as usual. Override with `REMOTION_BROWSER_EXECUTABLE`.
-- Fonts come from npm (`@fontsource/*`), not Google Fonts, so renders don't
-  need network access.
-- `out/` is git-ignored; rendered MP4s are not committed.
+- Remotion's headless-Chrome download (`remotion.media`) is blocked there, so
+  `remotion.config.ts` uses the pre-installed Chromium when present
+  (override with `REMOTION_BROWSER_EXECUTABLE`). Locally nothing changes.
+- Fonts come from npm (`@fontsource/*`), so renders need no network.
+- Image hosts like Wikimedia are blocked, so visuals are drawn in code.
 
 ## Licensing
 
