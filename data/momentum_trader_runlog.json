@@ -1,9 +1,9 @@
 {
-  "run_at": "2026-10-07T19:26:57.884209+00:00",
+  "run_at": "2026-10-08T00:05:48.648984+00:00",
   "risk_profile": "normal",
   "actions": [],
   "errors": [],
-  "equity": 9289.85,
+  "equity": 9234.2,
   "cash": 2715.05,
   "open_positions": 3,
   "closed_this_run": 0
