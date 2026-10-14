@@ -1,15 +1,14 @@
 {
-  "run_at": "2026-10-13T23:26:56.396007+00:00",
+  "run_at": "2026-10-14T22:40:42.730385+00:00",
   "positions_reviewed": 3,
-  "alerts": 1,
+  "alerts": 0,
   "watches": 3,
-  "momentum_drawdown_pct": -7.87,
+  "momentum_drawdown_pct": -7.32,
   "items": [
-    "alert:GTLB:stop_breached",
     "watch:ABBV:concentration",
-    "watch:GTLB:concentration",
+    "watch:OKTA:concentration",
     "watch:POW.TO:stale"
   ],
   "notify_level": "alert",
-  "emailed": true
+  "emailed": false
 }
