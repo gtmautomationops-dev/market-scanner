@@ -1,12 +1,12 @@
 {
-  "run_at": "2026-10-13T23:40:20.227346+00:00",
+  "run_at": "2026-10-14T18:06:56.352274+00:00",
   "risk_profile": "normal",
   "actions": [
-    "SELL GTLB \u2014 trailing stop +8.7%"
+    "BUY OKTA 13sh @ $214.62 (score 12.5)"
   ],
   "errors": [],
-  "equity": 9359.37,
-  "cash": 5624.25,
-  "open_positions": 2,
-  "closed_this_run": 1
+  "equity": 9452.62,
+  "cash": 2834.19,
+  "open_positions": 3,
+  "closed_this_run": 0
 }
