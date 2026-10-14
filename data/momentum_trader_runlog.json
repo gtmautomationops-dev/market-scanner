@@ -1,11 +1,9 @@
 {
-  "run_at": "2026-10-14T18:06:56.352274+00:00",
+  "run_at": "2026-10-14T23:04:55.743432+00:00",
   "risk_profile": "normal",
-  "actions": [
-    "BUY OKTA 13sh @ $214.62 (score 12.5)"
-  ],
+  "actions": [],
   "errors": [],
-  "equity": 9452.62,
+  "equity": 9408.95,
   "cash": 2834.19,
   "open_positions": 3,
   "closed_this_run": 0
