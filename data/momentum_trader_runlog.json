@@ -1,12 +1,10 @@
 {
-  "run_at": "2026-10-16T17:37:02.041544+00:00",
+  "run_at": "2026-10-16T22:42:17.431961+00:00",
   "risk_profile": "normal",
-  "actions": [
-    "SELL OKTA \u2014 stop loss -12.9%"
-  ],
+  "actions": [],
   "errors": [],
-  "equity": 9130.76,
+  "equity": 9128.09,
   "cash": 5263.05,
   "open_positions": 2,
-  "closed_this_run": 1
+  "closed_this_run": 0
 }
