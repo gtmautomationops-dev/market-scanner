@@ -1,14 +1,15 @@
 {
-  "run_at": "2026-10-15T22:41:28.403986+00:00",
-  "positions_reviewed": 3,
-  "alerts": 0,
+  "run_at": "2026-10-16T22:12:58.491392+00:00",
+  "positions_reviewed": 2,
+  "alerts": 1,
   "watches": 3,
-  "momentum_drawdown_pct": -7.61,
+  "momentum_drawdown_pct": -10.48,
   "items": [
+    "alert:FUND:drawdown",
     "watch:ABBV:concentration",
-    "watch:OKTA:concentration",
-    "watch:POW.TO:stale"
+    "watch:POW.TO:stale",
+    "watch:POW.TO:concentration"
   ],
   "notify_level": "alert",
-  "emailed": false
+  "emailed": true
 }
