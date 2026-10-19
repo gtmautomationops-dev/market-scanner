@@ -1,14 +1,14 @@
 {
-  "run_at": "2026-10-16T22:12:58.491392+00:00",
-  "positions_reviewed": 2,
+  "run_at": "2026-10-19T23:06:36.207099+00:00",
+  "positions_reviewed": 3,
   "alerts": 1,
   "watches": 3,
-  "momentum_drawdown_pct": -10.48,
+  "momentum_drawdown_pct": -10.84,
   "items": [
     "alert:FUND:drawdown",
     "watch:ABBV:concentration",
-    "watch:POW.TO:stale",
-    "watch:POW.TO:concentration"
+    "watch:APA:concentration",
+    "watch:POW.TO:stale"
   ],
   "notify_level": "alert",
   "emailed": true
