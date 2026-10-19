@@ -1,10 +1,12 @@
 {
-  "run_at": "2026-10-16T22:42:17.431961+00:00",
+  "run_at": "2026-10-19T19:25:07.898205+00:00",
   "risk_profile": "normal",
-  "actions": [],
+  "actions": [
+    "BUY APA 53sh @ $49.60 (score 12.0)"
+  ],
   "errors": [],
-  "equity": 9128.09,
-  "cash": 5263.05,
-  "open_positions": 2,
+  "equity": 9094.36,
+  "cash": 2634.25,
+  "open_positions": 3,
   "closed_this_run": 0
 }
