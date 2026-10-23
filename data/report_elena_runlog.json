@@ -1,10 +1,10 @@
 {
-  "run_at": "2026-10-16T22:57:11.858846+00:00",
-  "combined_pnl": -871.91,
-  "combined_return_pct": -8.72,
-  "week_pnl": -406.37,
-  "week_from": "2026-10-09",
-  "spy_return_pct": 3.29,
+  "run_at": "2026-10-23T23:19:51.081904+00:00",
+  "combined_pnl": -750.41,
+  "combined_return_pct": -7.5,
+  "week_pnl": 121.5,
+  "week_from": "2026-10-16",
+  "spy_return_pct": 2.85,
   "my_picks_pnl": 0.0,
-  "momentum_pnl": -871.91
+  "momentum_pnl": -750.41
 }
