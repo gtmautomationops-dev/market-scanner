@@ -1,9 +1,9 @@
 {
-  "run_at": "2026-10-27T23:14:38.052827+00:00",
+  "run_at": "2026-10-28T23:36:22.410906+00:00",
   "positions_reviewed": 3,
   "alerts": 0,
   "watches": 3,
-  "momentum_drawdown_pct": -9.46,
+  "momentum_drawdown_pct": -8.74,
   "items": [
     "watch:ABBV:concentration",
     "watch:APA:concentration",
