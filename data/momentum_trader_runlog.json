@@ -1,12 +1,10 @@
 {
-  "run_at": "2026-11-02T22:25:24.934825+00:00",
+  "run_at": "2026-11-03T02:06:45.965062+00:00",
   "risk_profile": "normal",
-  "actions": [
-    "SELL APA \u2014 trailing stop -1.6%"
-  ],
+  "actions": [],
   "errors": [],
-  "equity": 9160.37,
+  "equity": 9214.82,
   "cash": 5221.71,
   "open_positions": 2,
-  "closed_this_run": 1
+  "closed_this_run": 0
 }
