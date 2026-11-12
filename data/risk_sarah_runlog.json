@@ -1,9 +1,9 @@
 {
-  "run_at": "2026-11-11T00:15:13.143457+00:00",
+  "run_at": "2026-11-12T01:41:32.587540+00:00",
   "positions_reviewed": 3,
   "alerts": 0,
   "watches": 3,
-  "momentum_drawdown_pct": -8.25,
+  "momentum_drawdown_pct": -6.55,
   "items": [
     "watch:ABBV:concentration",
     "watch:DCBO.TO:concentration",
