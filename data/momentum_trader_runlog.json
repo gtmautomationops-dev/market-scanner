@@ -1,12 +1,10 @@
 {
-  "run_at": "2026-11-16T22:58:43.946885+00:00",
+  "run_at": "2026-11-17T02:50:54.967571+00:00",
   "risk_profile": "normal",
-  "actions": [
-    "SELL DCBO.TO \u2014 trailing stop +2.9%"
-  ],
+  "actions": [],
   "errors": [],
   "equity": 9260.2,
   "cash": 5295.49,
   "open_positions": 2,
-  "closed_this_run": 1
+  "closed_this_run": 0
 }
