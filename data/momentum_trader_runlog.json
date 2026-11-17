@@ -1,10 +1,12 @@
 {
-  "run_at": "2026-11-17T02:50:54.967571+00:00",
+  "run_at": "2026-11-17T21:51:48.143317+00:00",
   "risk_profile": "normal",
-  "actions": [],
+  "actions": [
+    "BUY DCBO.TO 63sh @ $41.83 (score 12.5)"
+  ],
   "errors": [],
-  "equity": 9260.2,
-  "cash": 5295.49,
-  "open_positions": 2,
+  "equity": 9263.11,
+  "cash": 2660.2,
+  "open_positions": 3,
   "closed_this_run": 0
 }
