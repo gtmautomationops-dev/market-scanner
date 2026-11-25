@@ -1,12 +1,14 @@
 {
-  "run_at": "2026-11-24T06:53:47.100750+00:00",
+  "run_at": "2026-11-25T00:19:24.829147+00:00",
   "first_run": false,
-  "since": "2026-11-14",
-  "ptrs_in_window": 7,
-  "filings_stored": 0,
-  "trades_stored": 0,
+  "since": "2026-11-15",
+  "ptrs_in_window": 9,
+  "filings_stored": 1,
+  "trades_stored": 157,
   "skipped_duplicate": 6,
   "unparseable_pdfs": 1,
   "unmatched_members": 0,
-  "errors": []
+  "errors": [
+    "20036848 (Meuser): 404 Client Error: Not Found for url: https://disclosures-clerk.house.gov/public_disc/ptr-pdfs/2026/20036848.pdf"
+  ]
 }
